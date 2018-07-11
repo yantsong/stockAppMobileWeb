@@ -35,6 +35,7 @@ export default {
         if (res.code === 20000) {
           this.stocksId = res.data.stocks
           const params = extractSymbolToParams(this.stocksId)
+          console.log(params);
           stocksApi.getStocksReal(params.slice(1)).then(res => {
             const { snapshot } = res.data
             this.fields = snapshot.fields
