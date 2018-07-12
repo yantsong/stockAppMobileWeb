@@ -40,7 +40,8 @@
     </div>
     <div class="subject-detail-related-fund">
       <info-panel title="相关基金" :more='true' @moreClick="handleMoreFundsClick">
-        <fund-list :funds="funds.slice(0,3)"></fund-list>
+        <fund-list :funds="funds.slice(0,3)" v-if="funds.length > 0"></fund-list>
+        <div v-else class="no-info">暂无相关基金</div>
       </info-panel>
     </div>
     <div class="subject-detail-information">
@@ -216,7 +217,7 @@ export default {
       stocksApi.getFundList(this.bkjId).then(
         res => {
           if (res.code === 20000){
-            this.funds = this._fundFilter(res.data.funds).slice(0,20)
+            this.funds = res.data.funds
           }
           }
       ).catch(
@@ -294,6 +295,7 @@ export default {
       }
     },
     handleMoreFundsClick () {
+      if (!this.funds.length) return 
       if (versions().isAndroid) {
         this.$router.push(`/relatedFunds/${this.bkjId}`)
       } else if (versions().isIOS) {
@@ -491,11 +493,11 @@ export default {
         border-bottom: none;
       }
     }
-    .no-info {
+  }
+.no-info {
       color:#333333;
       text-align:center;
-      padding-top: 16px;
+      padding: 16px 0;
     }
-  }
 }
 </style>

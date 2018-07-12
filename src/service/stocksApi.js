@@ -23,7 +23,7 @@ export default {
   // 获取基金池
   getFundList: (id) => {
     return axios.get(
-      `https://wows-api.wallstreetcn.com/v3/aioria/sset/funds?id=${id}`
+      `https://wows-api-sit.wallstreetcn.com/v3/aioria/sset/funds?id=${id}&minstar=1`
     ).then(
       res => Promise.resolve(res.data)
     )
