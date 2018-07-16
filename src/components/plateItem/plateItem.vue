@@ -58,7 +58,7 @@ export default {
     _redirect() {
       this.$router.push(`/subjectDetail/${this.info.bkj_id}`);
     },
-    //获取涨跌详情
+    // 获取涨跌详情
     _getRate() {
       api
         .getStocksReal(this._filterStocks(this.info.featured_msg_stocks))

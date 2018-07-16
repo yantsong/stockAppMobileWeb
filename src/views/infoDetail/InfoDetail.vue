@@ -68,13 +68,13 @@ export default {
     }
   },
   mounted () {
-    try {
-      if (!this.$route.query.isShare) {
-        this.showChangeFontButton()
-      }
-    } catch (e) {
-      console.log(e)
-    }
+    // try {
+    //   if (!this.$route.query.isShare) {
+    //     this.showChangeFontButton()
+    //   }
+    // } catch (e) {
+    //   console.log(e)
+    // }
     window.changeFontSize = (state) => {
       if (Number(state)) {
         this.bigFont = true

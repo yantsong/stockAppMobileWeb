@@ -29,13 +29,14 @@ export default {
         .getFundList(this.bkjId)
         .then(res => {
           if (res.code === 20000) {
+            console.log(this._fundFilter(res.data.funds));
             this.funds = this._fundFilter(res.data.funds).slice(0, 10);
           }
         })
         .catch(e => console.log(e));
     },
     _fundFilter(data) {
-      return data.sort((a, b) => b.ratio_in_nv - a.ratio_in_nv);
+      return data.sort((a, b) => b.star - a.star);
     },
     _changeMeta() {
       stocksApi.getPlatNormalInfo(this.bkjId).then(res => {
@@ -43,9 +44,7 @@ export default {
           this.bkjName = res.data.plate_name;
           let head = document.getElementsByTagName("title");
           console.log(head);
-          //   let meta = document.createElement("meta");
           head[0].innerHTML = `${this.bkjName}相关基金`;
-          //   head[0].appendChild(meta);
         }
       });
     }

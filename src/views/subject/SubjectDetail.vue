@@ -217,7 +217,7 @@ export default {
       stocksApi.getFundList(this.bkjId).then(
         res => {
           if (res.code === 20000){
-            this.funds = res.data.funds
+            this.funds = this._fundFilter(res.data.funds) 
           }
           }
       ).catch(
@@ -226,7 +226,7 @@ export default {
     },
     _fundFilter(data){
       return data.sort(
-        (a,b) => b.ratio_in_nv - a.ratio_in_nv
+        (a,b) => b.star - a.star
       )
     },
     //板块涨跌
@@ -287,29 +287,34 @@ export default {
       })
     },
     handleMoreClick () {
-      if (versions().isAndroid) {
+      // if (versions().isAndroid) {
+      //   this.$router.push(`/stockList/${this.bkjId}`)
+      // } else if (versions().isIOS) {
+      //   const url = `${location.origin}/guoyuan/jinrijihuih5/stockList/${this.bkjId}`
+      //   location.href = `KDS_Native://switchWebView:'':${url}`
+      // }
         this.$router.push(`/stockList/${this.bkjId}`)
-      } else if (versions().isIOS) {
-        const url = `${location.origin}/guoyuan/jinrijihuih5/stockList/${this.bkjId}`
-        location.href = `KDS_Native://switchWebView:'':${url}`
-      }
+
     },
     handleMoreFundsClick () {
       if (!this.funds.length) return 
-      if (versions().isAndroid) {
         this.$router.push(`/relatedFunds/${this.bkjId}`)
-      } else if (versions().isIOS) {
-        const url = `${location.origin}/guoyuan/jinrijihuih5/relatedFunds/${this.bkjId}`
-        location.href = `KDS_Native://switchWebView:'':${url}`
-      }
+      // if (versions().isAndroid) {
+      //   this.$router.push(`/relatedFunds/${this.bkjId}`)
+      // } else if (versions().isIOS) {
+      //   const url = `${location.origin}/guoyuan/jinrijihuih5/relatedFunds/${this.bkjId}`
+      //   location.href = `KDS_Native://switchWebView:'':${url}`
+      // }
     },
     handleItemClick (val) {
-      if (versions().isAndroid) {
         this.$router.push(`/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`)
-      } else if (versions().isIOS) {
-        const url = `${location.origin}/guoyuan/jinrijihuih5/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`
-        location.href = `KDS_Native://switchWebView:'':${url}`
-      }
+
+      // if (versions().isAndroid) {
+      //   this.$router.push(`/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`)
+      // } else if (versions().isIOS) {
+      //   const url = `${location.origin}/guoyuan/jinrijihuih5/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`
+      //   location.href = `KDS_Native://switchWebView:'':${url}`
+      // }
     },
     handleShareClick (val) {
       if (!this.isLoadMsgEnd) {
