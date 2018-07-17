@@ -24,7 +24,7 @@
       v-else
       class="info-detail-share"
       @click="redirectToDownload">
-      <i class="iconfont icon-xiazai"></i>下载/打开国元点金
+      <i class="iconfont icon-xiazai"></i>下载/打开APP
     </div>
   </div>
 </template>

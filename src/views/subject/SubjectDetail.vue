@@ -38,7 +38,7 @@
         <stock-list :stocks="leadStocks" th-name="名称" :sort="false"></stock-list>
       </info-panel>
     </div>
-    <div class="subject-detail-related-fund">
+    <div class="subject-detail-related-fund" v-if="type == 0">
       <info-panel title="相关基金" :more='true' @moreClick="handleMoreFundsClick">
         <fund-list :funds="funds.slice(0,3)" v-if="funds.length > 0"></fund-list>
         <div v-else class="no-info">暂无相关基金</div>
@@ -105,6 +105,7 @@ export default {
       limit: 40,
       isLoadMsgEnd: true,
       proCode: null,
+      type: 0,
       isIOS: versions().isIOS
     }
   },
@@ -122,6 +123,7 @@ export default {
     this.initStocksData()
     this.getSubjectMsgs()
     this._getfund()
+    this._initType()
     // this.initRefresh(30)
   },
   computed: {
@@ -228,6 +230,10 @@ export default {
       return data.sort(
         (a,b) => b.star - a.star
       )
+    },
+    _initType(){
+      console.log(this.$route.query);
+      this.type = this.$route.query.type
     },
     //板块涨跌
     getPlatRateInfo () {

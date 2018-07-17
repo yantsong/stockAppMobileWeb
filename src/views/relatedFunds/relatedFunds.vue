@@ -30,7 +30,7 @@ export default {
         .then(res => {
           if (res.code === 20000) {
             console.log(this._fundFilter(res.data.funds));
-            this.funds = this._fundFilter(res.data.funds).slice(0, 10);
+            this.funds = this._fundFilter(res.data.funds).slice(0, 20);
           }
         })
         .catch(e => console.log(e));

@@ -8,7 +8,7 @@
                     <h3>{{info.title}}</h3>
                 </div>
                 <div class="time">
-                    {{info.featured_msg_created_at * 1000 | formatTime}}
+                    {{info.featured_msg_created_at * 1000 | fomatTimeShort}}
                 </div>
             </dt>
             <dd v-if="info && info.featured_msg_title" class="plate-item-desc" v-html="info.featured_msg_title"></dd>
@@ -43,7 +43,8 @@ export default {
     index: {
       type: Number,
       default: 0
-    }
+    },
+    query: {}
   },
   data() {
     return {
@@ -56,7 +57,13 @@ export default {
   },
   methods: {
     _redirect() {
-      this.$router.push(`/subjectDetail/${this.info.bkj_id}`);
+      this.$router.push({
+        name: `SubjectDetail`,
+        params: {
+          id: this.info.bkj_id
+        },
+        query: this.query
+      });
     },
     // 获取涨跌详情
     _getRate() {
@@ -67,9 +74,20 @@ export default {
           this.stocksPool = res.data.snapshot;
         });
     },
+    // 筛选出对应股票,已符合api接口的形式传递
     _filterStocks(stocks) {
       let str = stocks.reduce((sum, current) => sum + `${current.symbol},`, "");
       return str.slice(0, -1);
+    }
+  },
+  filters: {
+    fomatTimeShort: function(value) {
+      return new Date(value)
+        .toLocaleString()
+        .replace(/(:\d{1,2}$)|(\d{4}\/)|[\u4e00-\u9fa5]/g, "")
+        .replace(/(\d{1}\/)/, "0$1")
+        .replace(/\/(\d{1}\s)/, "/0$1")
+        .replace(/\b(\d{1}:)/, "0$1");
     }
   },
   components: {
@@ -88,7 +106,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    line-height: 38px;
+    line-height: 32px;
     margin-bottom: 16px;
     .title {
       display: flex;
@@ -96,25 +114,28 @@ export default {
       justify-content: flex-start;
     }
     span {
-      background-color: #ff4a48;
+      background-image: linear-gradient(90deg, #ff3736 0%, #ff6461 100%);
       text-align: center;
-      font-size: 30px;
-      margin-right: 5px;
+      font-size: 24px;
+      margin-right: 8px;
       border-radius: 50%;
-      width: 38px;
+      width: 32px;
+      height: 32px;
       display: inline-block;
       color: white;
     }
     span.gray {
+      background-image: none;
       background-color: #7a8399;
     }
     h3 {
-      font-size: 38px;
+      font-size: 32px;
       color: #333333;
     }
     .time {
-      color: #c0c0c0c0;
-      font-size: 30px;
+      font-family: SFUIText-Regular;
+      font-size: 24px;
+      color: #bcbcbc;
     }
   }
   &-desc {
