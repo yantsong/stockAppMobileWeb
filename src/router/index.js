@@ -11,7 +11,7 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  base: '/',
+  base: '/h5/jinrijihui',
   routes: [
     {
       path: '/subjectDetail/:id',
