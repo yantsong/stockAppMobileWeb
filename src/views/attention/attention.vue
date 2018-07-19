@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import PlateItem from "@/components/Plateitem/Plateitem";
+import PlateItem from "@/components/plateitem/plateitem";
 import api from "@/service/stocksApi";
 
 export default {
