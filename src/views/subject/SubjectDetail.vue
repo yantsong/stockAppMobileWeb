@@ -232,7 +232,6 @@ export default {
       )
     },
     _initType(){
-      console.log(this.$route.query);
       this.type = this.$route.query.type
     },
     //板块涨跌
