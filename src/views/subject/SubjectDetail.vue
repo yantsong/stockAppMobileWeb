@@ -38,7 +38,7 @@
         <stock-list :stocks="leadStocks" th-name="名称" :sort="false"></stock-list>
       </info-panel>
     </div>
-    <div class="subject-detail-related-fund">
+    <div class="subject-detail-related-fund" v-if="type == 0">
       <info-panel title="相关基金" :more='true' @moreClick="handleMoreFundsClick">
         <fund-list :funds="funds.slice(0,3)" v-if="funds.length > 0"></fund-list>
         <div v-else class="no-info">暂无相关基金</div>
@@ -105,6 +105,7 @@ export default {
       limit: 40,
       isLoadMsgEnd: true,
       proCode: null,
+      type: 0,
       isIOS: versions().isIOS
     }
   },
@@ -122,6 +123,7 @@ export default {
     this.initStocksData()
     this.getSubjectMsgs()
     this._getfund()
+    this._initType()
     // this.initRefresh(30)
   },
   computed: {
@@ -217,7 +219,7 @@ export default {
       stocksApi.getFundList(this.bkjId).then(
         res => {
           if (res.code === 20000){
-            this.funds = res.data.funds
+            this.funds = this._fundFilter(res.data.funds) 
           }
           }
       ).catch(
@@ -226,8 +228,11 @@ export default {
     },
     _fundFilter(data){
       return data.sort(
-        (a,b) => b.ratio_in_nv - a.ratio_in_nv
+        (a,b) => b.star - a.star
       )
+    },
+    _initType(){
+      this.type = this.$route.query.type
     },
     //板块涨跌
     getPlatRateInfo () {
@@ -287,29 +292,34 @@ export default {
       })
     },
     handleMoreClick () {
-      if (versions().isAndroid) {
+      // if (versions().isAndroid) {
+      //   this.$router.push(`/stockList/${this.bkjId}`)
+      // } else if (versions().isIOS) {
+      //   const url = `${location.origin}/guoyuan/jinrijihuih5/stockList/${this.bkjId}`
+      //   location.href = `KDS_Native://switchWebView:'':${url}`
+      // }
         this.$router.push(`/stockList/${this.bkjId}`)
-      } else if (versions().isIOS) {
-        const url = `${location.origin}/guoyuan/jinrijihuih5/stockList/${this.bkjId}`
-        location.href = `KDS_Native://switchWebView:'':${url}`
-      }
+
     },
     handleMoreFundsClick () {
       if (!this.funds.length) return 
-      if (versions().isAndroid) {
         this.$router.push(`/relatedFunds/${this.bkjId}`)
-      } else if (versions().isIOS) {
-        const url = `${location.origin}/guoyuan/jinrijihuih5/relatedFunds/${this.bkjId}`
-        location.href = `KDS_Native://switchWebView:'':${url}`
-      }
+      // if (versions().isAndroid) {
+      //   this.$router.push(`/relatedFunds/${this.bkjId}`)
+      // } else if (versions().isIOS) {
+      //   const url = `${location.origin}/guoyuan/jinrijihuih5/relatedFunds/${this.bkjId}`
+      //   location.href = `KDS_Native://switchWebView:'':${url}`
+      // }
     },
     handleItemClick (val) {
-      if (versions().isAndroid) {
         this.$router.push(`/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`)
-      } else if (versions().isIOS) {
-        const url = `${location.origin}/guoyuan/jinrijihuih5/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`
-        location.href = `KDS_Native://switchWebView:'':${url}`
-      }
+
+      // if (versions().isAndroid) {
+      //   this.$router.push(`/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`)
+      // } else if (versions().isIOS) {
+      //   const url = `${location.origin}/guoyuan/jinrijihuih5/infoDetail/${val.msg_id}?frombkj=${this.bkjId}`
+      //   location.href = `KDS_Native://switchWebView:'':${url}`
+      // }
     },
     handleShareClick (val) {
       if (!this.isLoadMsgEnd) {

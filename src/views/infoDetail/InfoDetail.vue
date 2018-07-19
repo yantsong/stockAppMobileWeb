@@ -24,7 +24,7 @@
       v-else
       class="info-detail-share"
       @click="redirectToDownload">
-      <i class="iconfont icon-xiazai"></i>下载/打开国元点金
+      <i class="iconfont icon-xiazai"></i>下载/打开APP
     </div>
   </div>
 </template>
@@ -68,13 +68,13 @@ export default {
     }
   },
   mounted () {
-    try {
-      if (!this.$route.query.isShare) {
-        this.showChangeFontButton()
-      }
-    } catch (e) {
-      console.log(e)
-    }
+    // try {
+    //   if (!this.$route.query.isShare) {
+    //     this.showChangeFontButton()
+    //   }
+    // } catch (e) {
+    //   console.log(e)
+    // }
     window.changeFontSize = (state) => {
       if (Number(state)) {
         this.bigFont = true
