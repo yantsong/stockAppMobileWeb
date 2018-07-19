@@ -9,7 +9,7 @@
                 </div>
                 <div class="time">
                     {{info.featured_msg_created_at * 1000 | fomatTimeShort}}
-                </div> 
+                </div>
             </dt>
             <dd v-if="info && info.featured_msg_title" class="plate-item-desc" v-html="info.featured_msg_title"></dd>
         </dl>
