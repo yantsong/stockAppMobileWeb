@@ -11,7 +11,7 @@ variables:
 
 build:prod:
   stage: build
-  image: ccr.ccs.tencentyun.com/dhub.wallstcn.com/node-base:6.9.2
+  image: ccr.ccs.tencentyun.com/dhub.wallstcn.com/node-base:9.3
   before_script:
     # Install ssh-agent if not already installed, it is required by Docker.
     # (change apt-get to yum if you use a CentOS-based image)
