@@ -90,7 +90,8 @@ export default {
       line-height: 30px;
     }
     p {
-      font-size: 12px;
+      height: 15px;
+      font-size: 26px;
       line-height: 15px;
       color: #666666;
       text-align: center;

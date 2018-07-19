@@ -112,4 +112,41 @@ $night-light-1: #191D2D;
   .stock-list-views {
     background: #151928;
   }
+  //view funlist
+  .fund-list-item{
+    p{
+      color:white!important;
+    }
+    dl{
+      dt, p,dd{
+        color:white;
+      }
+      
+    }
+  }
+  .subject-detail{
+    .fund-list-ul{
+      border-color: #0f1322!important;
+      background-color: #191d2d!important;
+    }
+  }
+  .subject-detail-related-fund{
+    border-color: #0f1322!important;
+  }
+  .attention{
+    background-color: #191d2d;
+    .plate-item-line{
+      background-color: #0f1322;
+    }
+    .plate-item{
+      dd{
+        color:white;
+      }
+      dt{
+        h3{
+          color: white;
+        }
+      }
+    }
+  }
 }

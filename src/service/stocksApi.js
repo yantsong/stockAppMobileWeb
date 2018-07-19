@@ -36,6 +36,14 @@ export default {
       `https://wows-api.wallstreetcn.com/real?fields=prod_name,px_change,last_px,px_change_rate,trade_status,circulation_value,pe_rate,market_value,turnover_ratio&en_prod_code=${stocks}`
     ).then(res => Promise.resolve(res.data))
   },
+  /**
+   * 返回今日机会
+   */
+  getTodayChance: () => {
+    return axios.get(
+      `https://alli-api-sit.xuangubao.cn/showdemo/jinrijihui`
+    ).then(res => Promise.resolve(res.data))
+  },
 
   /**
    * 返回当天资金流向
@@ -60,7 +68,7 @@ export default {
    */
   getSubjectInfo: (id, flag = false) => {
     return axios.get(
-      `${baseURL}/guoyuan/subjects/${id}?nomsg=${flag}`
+      `${baseURL}/showdemo/subjects/${id}?nomsg=${flag}`
     ).then(res => Promise.resolve(res.data))
   },
 
@@ -69,7 +77,7 @@ export default {
    */
   getMsgDetail: id => {
     return axios.get(
-      `${baseURL}/guoyuan/messages/${id}`
+      `${baseURL}/showdemo/messages/${id}`
     ).then(res => Promise.resolve(res.data))
   },
 
@@ -78,7 +86,7 @@ export default {
    */
   getMoreMsgs: (bkjId, page, limit) => {
     return axios.get(
-      `${baseURL}/guoyuan/subjects/${bkjId}/messages?page=${page}&limit=${limit}`
+      `${baseURL}/showdemo/subjects/${bkjId}/messages?page=${page}&limit=${limit}`
     ).then(res => Promise.resolve(res.data))
   }
 }
