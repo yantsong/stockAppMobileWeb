@@ -4,7 +4,7 @@
       v-for="stock in stocks"
       :key="stock.symbol"
       :class="colorName(stock.symbol)"
-      @click="handleStockClick(stock)">
+     >
       <i :class="iconClass(stock.symbol)"></i>
       <span>{{ stock.name }}</span>
       <span>{{isChangeRateUp(stock.symbol) ? '+' : ''}}{{ (getPxChangeRate(stock.symbol) || 0) | toFixed_2 }}%</span>
@@ -64,6 +64,7 @@ export default {
     getIndexByField (fieldName, fields) {
       return fields && fields.length > 0 && fields.indexOf(fieldName)
     },
+    // 跳转个股
     handleStockClick (stock) {
       const symbol = stock.symbol
       const code = symbol.split('.')[0]

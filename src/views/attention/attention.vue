@@ -23,6 +23,12 @@ export default {
     };
   },
   created() {
+    const themeType = Number(this.$route.query.skin)
+    if (themeType) {
+      document.querySelector('#app').setAttribute('class', 'night-theme')
+      document.body.style.background = '#0F1322'
+    }
+    localStorage.setItem('__THEME_TYPE__', themeType)
     this._initData();
     this._ViewStyle();
   },
