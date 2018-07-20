@@ -36,7 +36,6 @@
         <tr class="stock-list-body-row"
           v-for="stock in stocks"
           :key="stock.circulation_value"
-          
           >
           <td class="text-left">
             <span class="name">{{ stock.prod_name }}</span>
