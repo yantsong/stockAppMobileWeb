@@ -97,7 +97,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .plate-item {
-  padding: 30px 28px 24px;
+  padding: 34px 28px 24px;
   &-line {
     height: 1px;
     background-color: #efefef;
