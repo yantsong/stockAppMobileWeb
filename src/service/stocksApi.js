@@ -41,7 +41,7 @@ export default {
    */
   getTodayChance: () => {
     return axios.get(
-      `https://alli-api.xuangubao.cn/showdemo/jinrijihui`
+      `${baseURL}/showdemo/jinrijihui`
     ).then(res => Promise.resolve(res.data))
   },
 

@@ -150,11 +150,12 @@ export default {
     getTodayLongTou () {
       stocksApi.getLongtou(this.bkjId).then(res => {
         if (res.code === 20000 && res.data.jin_ri_long_tou) {
-          let jin_ri_long_tou = res.data.jin_ri_long_tou
-          if (jin_ri_long_tou.length === 0 && res.data.hang_ye_long_tou) {
-           jin_ri_long_tou = Object.keys(res.data.hang_ye_long_tou)
+          let {jin_ri_long_tou, hang_ye_long_tou} = res.data
+          if (jin_ri_long_tou.length === 0 && hang_ye_long_tou) { // 如果今日龙头不存在 而行业龙头存在 今日龙头 = 行业龙头
+           jin_ri_long_tou = Object.keys(hang_ye_long_tou)
+           console.log(jin_ri_long_tou, hang_ye_long_tou);
           }
-          if (jin_ri_long_tou.length > 0) {
+          if (jin_ri_long_tou.length > 0) { // 今日龙头 或 行业龙头 
             this.leadStocksId = jin_ri_long_tou.reduce((acc, current) => {
               return acc.concat(current)
             }, [])
@@ -163,11 +164,33 @@ export default {
               this.fields = snapshot.fields
               this.leadStocks = formatDataByFields(snapshot, this.fields)
             })
+          }else if (jin_ri_long_tou.length === 0) { // 如果今日龙头和行业龙头都不存在 则取板块股票中前三
+          this.getLeadesStocks3()
           }
+        }else {
+          this.getLeadesStocks3()
         }
-      }).catch(e => {
+      }
+      ).catch(e => {
         console.log(e)
       })
+    },
+    getLeadesStocks3(){
+       stocksApi.getBanKuaiStocksPool(this.bkjId).then(res => {
+              if (res.code === 20000) {
+                this.stocksId = res.data.stocks.splice(0,3)
+                console.log(extractSymbolToParams(this.stocksId));
+                return extractSymbolToParams(this.stocksId)
+              }
+            }).then(
+              parmas => {
+                stocksApi.getStocksReal(parmas).then(res => {
+                const { snapshot } = res.data
+                this.fields = snapshot.fields
+                this.leadStocks = formatDataByFields(snapshot, this.fields)
+            })
+              }
+            )
     },
     getSubjectMsgs () {
       stocksApi.getSubjectInfo(this.bkjId).then(res => {
