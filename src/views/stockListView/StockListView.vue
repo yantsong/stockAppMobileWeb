@@ -36,7 +36,8 @@ export default {
           this.stocksId = res.data.stocks
           const params = extractSymbolToParams(this.stocksId)
           console.log(params);
-          stocksApi.getStocksReal(params.slice(1)).then(res => {
+          // params.slice(1) => params
+          stocksApi.getStocksReal(params).then(res => {
             const { snapshot } = res.data
             this.fields = snapshot.fields
             this.stocksPool = formatDataByFields(snapshot, this.fields)
