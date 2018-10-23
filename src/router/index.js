@@ -3,6 +3,7 @@ import Router from 'vue-router'
 
 const SubjectDetail = () => import('@/views/subject/SubjectDetail')
 const Attention = () => import('@/views/attention/attention')
+const Transaction = () => import('@/views/transaction/transaction')
 const StockListView = () => import('@/views/stockListView/StockListView')
 const InfoDetail = () => import('@/views/infoDetail/InfoDetail')
 const RelatedFunds = () => import('@/views/relatedFunds/relatedFunds')
@@ -22,6 +23,11 @@ export default new Router({
       path: '/attention',
       name: 'Attention',
       component: Attention
+    },
+    {
+      path: '/transaction',
+      name: 'Transaction',
+      component: Transaction
     },
     {
       path: '/relatedFunds/:id',

@@ -1,7 +1,14 @@
 import axios from 'axios'
 
 const baseURL = process.env.BASE_URL
-
+/**
+   * 获取A股分时
+   */
+export const getSSMin = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/trend?fields=min_time,last_px,avg_px,business_amount,business_balance&prod_code=000001.SS`
+  ).then(res => Promise.resolve(res.data))
+}
 export default {
   /**
    * 获取板块及龙头
@@ -11,7 +18,6 @@ export default {
       `https://baoer-api-prod.xuangubao.cn/api/v2/plate/${bkjId}/longtou`
     ).then(res => Promise.resolve(res.data))
   },
-
   /**
    * 获取板块股票
    */
@@ -55,8 +61,8 @@ export default {
   },
 
   /**
-  * 获取板块涨跌幅
-  */
+   * 获取板块涨跌幅
+   */
   getPlatNormalInfo: id => {
     return axios.get(
       `https://wows-api.wallstreetcn.com/v3/aioria/plates/detail?id=${id}`
