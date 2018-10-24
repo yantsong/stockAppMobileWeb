@@ -9,9 +9,10 @@
 import {getSSMin} from '@/service/stocksApi'
 let echarts = require('echarts/lib/echarts')
 require('echarts/lib/chart/line')
+require('echarts/lib/chart/bar')
 require('echarts/lib/component/markLine')
 let myChart
-var date = ['09:30', '10:30', '11:30/13:30', '14:00', '15:00'];
+// var date = ['0930', '1030', '1130', '1400', '1500'];
 const seriesLineColor = ['#3165c3', '#a5a5a5', '#38b6fc'];
 const borderColor = '#eee';
 
@@ -20,8 +21,11 @@ export default {
     return {
       minData: '',
       pre_px: '',
-      dataX: [],
-      dataY: [],
+      dataLineX: [],
+      dataLineY: [],
+      dataBarX: [],
+      dataBarY: [],
+      datalinePre: [],
       max: '',
       min: ''
     }
@@ -41,35 +45,16 @@ export default {
   watch: {
     minData: function() {
       this.computeMaxMin()
-      this.computeDataXY()
+      this.computedataLineXY()
       // this.
     },
     // eslint-disable-next-line
-    dataY: function(){
+    dataLineY: function(){
       this.empdata()
     }
   },
 
   methods: {
-    abs(valarr) {
-      let arr = valarr.sort((a, b) => a - b)
-      this.max = arr[0]
-      this.min = arr[arr.length - 1]
-      return Math.max(Math.abs(arr[0]), Math.abs(arr[arr.length - 1]))
-    },
-    fmttime(time) {
-      let newarr = [ ]
-      let arr = time.toString().split('')
-      arr.forEach(
-        (item, index) => {
-          if (index === 4 || index === 6) { newarr.push('/') }
-          if (index === 8) { newarr.push(' ') }
-          if (index === 10) { newarr.push(':') }
-          newarr.push(item)
-        }
-      )
-      return newarr.join('')
-    },
     getData() {
       return getSSMin().then(
         res => {
@@ -100,71 +85,129 @@ export default {
       this.max = this.max.toFixed(2)
       this.min = this.min.toFixed(2)
     },
-    computeDataXY() {
+    computedataLineXY() {
+      let initnumber = 0
+      let colorNumber = 0
       let minData = this.minData
-      let dataX = []
-      let dataY = []
+      let dataLineX = []
+      let dataLineY = []
+      let dataBarY = []
+      let datalinePre = []
       minData.forEach(
         (item, index) => {
-          let objx = item[0].toString().slice(-4)
-          let objy = {value: item[1].toFixed(2),
+          // let objx = item[0].toString().slice(-4)
+          let objx = {value: item[0].toString().slice(-4),
             label: {
+              show: true
+            },
+            splitLine: {
+              show: true
+            }}
+
+          let objy = {value: item[1].toFixed(2),
+            itemStyle: {
               normal: {show: false},
               emphasis: {show: false}
-            }}
-          dataX.push(objx)
-          dataY.push(objy)
+            }
+          }
+          let objbar = {value: item[3] - initnumber,
+            color: item[1] - colorNumber,
+            itemStyle: {
+              color: item[1] > colorNumber ? '#f3564d' : '#1cbf7b'
+            }
+          }
+          dataLineX.push(objx)
+          dataLineY.push(objy)
+          dataBarY.push(objbar)
+          datalinePre.push(item[2].toFixed(2))
+          initnumber = item[3]
+          colorNumber = item[1]
         }
       )
-      this.dataX = dataX
-      this.dataY = dataY
+      this.dataLineX = dataLineX
+      this.dataLineY = dataLineY
+      this.dataBarY = dataBarY
+      this.datalinePre = datalinePre
     },
     empdata() {
-      let {dataX, dataY, min, max, pre_px} = this
+      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, pre_px} = this
 
-      let series = {
-        type: 'line',
-        label: {
-          normal: {
-            show: false,
-            position: 'inside'
-          }
-        },
-        lineStyle: {
-          normal: {
-            width: 1,
-            color: seriesLineColor[0]
-          }
-        },
-        markLine: {
-          silent: true,
-          lineStyle: {
-            normal: {color: '#558fe7'
+      let series = [
+        {
+          type: 'line',
+          label: {
+            normal: {
+              show: false,
+              position: 'inside'
             }
           },
-          data: [{
-            name: 'a',
-            yAxis: pre_px
-          }],
-          symbol: 'none'
+          lineStyle: {
+            normal: {
+              width: 1,
+              color: '#fec501'
+            }
+          },
+          axisLabel: {
+            inside: true,
+            color: '#8c8f8c',
+            margin: '0',
+            formatter: (value) => {
+              return value.toString() === max ? `\n\n\n${value}` : `${value}\n`
+            }
+          },
+          symbol: 'none',
+          data: datalinePre
         },
-        symbol: 'none',
-        // symbolSize: 2,
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-            offset: 0,
-            color: '#d5e2fb'
-          }, {
-            offset: 1,
-            color: '#fafcff'
-          }])
-        }
-      };
-      series.data = dataY
-      console.log(`----`, dataX, dataY);
+        {
+          type: 'line',
+          label: {
+            normal: {
+              show: false,
+              position: 'inside'
+            }
+          },
+          lineStyle: {
+            normal: {
+              width: 1,
+              color: seriesLineColor[0]
+            }
+          },
+          markLine: {
+            silent: true,
+            lineStyle: {
+              normal: {color: '#558fe7'
+              }
+            },
+            data: [{
+              name: 'a',
+              yAxis: pre_px
+            }],
+            symbol: 'none'
+          },
+          symbol: 'none',
+          // symbolSize: 2,
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: '#d5e2fb'
+            }, {
+              offset: 1,
+              color: '#fafcff'
+            }])
+          },
+          data: dataLineY
+        },
+        {
+          type: 'bar',
+          xAxisIndex: 1,
+          yAxisIndex: 1,
+          data: dataBarY
+        }];
+      console.log(`----`, dataLineX, dataLineY, dataBarY);
 
       // 分时图配置
       var tchartOptions = {
+        color: ['red', 'green'],
         tooltip: {
           show: true,
           trigger: 'none',
@@ -180,25 +223,24 @@ export default {
             return html;
           }
         },
-        grid: {
+        grid: [{
           left: '0px',
           right: '0px',
-          top: '10px',
-          bottom: '0px',
+          height: '70%',
+          top: '0px',
           containLabel: true
         },
+        {
+          left: '0px',
+          right: '0px',
+          top: '68%',
+          bottom: '0px',
+          containLabel: true
+        }],
         xAxis: [
           {
-            // type: 'time',
-            // name: '1111111111111111111',
-            // nameLocation: 'start',
-            // nameTextStyle: {
-            //   color: '#ffffff',
-            //   fontSize: 24,
-            //   padding: [4]
-            // },
             scale: true,
-            boundaryGap: true,
+            boundaryGap: false,
             axisLabel: {
               show: true,
               // padding: [1, 0, 1, 0],
@@ -207,7 +249,6 @@ export default {
                 color: '#c3c5c3'
               },
               interval: (index, val) => {
-                // if()
                 if (val === '0930' || val === '1030' || val === '1130' || val === '1400' || val === '1500') {
                   return val
                 } else {
@@ -231,22 +272,33 @@ export default {
               // }
             },
             splitLine: {
-              // show: true,
+              show: true,
               lineStyle: {
-                color: ['#aaa', '#ddd']
+                color: '#eff0f2'
+              },
+              interval: (index, val) => {
+                if (val === '1030' || val === '1130' || val === '1400' || val === '1500') {
+                  return true
+                } else {
+                  return false
+                }
               }
-              // interval: (index, val) => {
-              //   // if()
-              //   if (val === '000009:30' || val === '1030' || val === '1130' || val === '1400' || val === '1500') {
-              //     return true
-              //   } else {
-              //     return false
-              //   }
-              // }
-              // interval: 60
             },
-            // splitNumber: 2
-            data: dataX
+            data: dataLineX
+          },
+          {
+            type: 'category',
+            gridIndex: 1,
+            data: dataLineX,
+            scale: true,
+            boundaryGap: false,
+            axisLine: {onZero: false},
+            axisTick: {show: false},
+            splitLine: {show: false},
+            axisLabel: {show: false},
+            splitNumber: 20,
+            min: 'dataMin',
+            max: 'dataMax'
           }
         ],
         yAxis: [
@@ -267,15 +319,15 @@ export default {
               } else {
                 return false
               }
-              // return false
             },
             z: 99,
-            // splitNumber: 2,
             axisLabel: {
               inside: true,
               color: '#8c8f8c',
               margin: '0',
-              padding: [0, 0, 10, 0]
+              formatter: (value) => {
+                return value.toString() === max ? `\n${value}` : `${value}\n`
+              }
             },
             axisTick: {
               show: false
@@ -294,6 +346,15 @@ export default {
                 color: borderColor
               }
             }
+          },
+          {
+            scale: true,
+            gridIndex: 1,
+            splitNumber: 2,
+            axisLabel: {show: false},
+            axisLine: {show: false},
+            axisTick: {show: false},
+            splitLine: {show: false}
           }
         ],
         dataZoom: [
@@ -307,98 +368,6 @@ export default {
         series: series
       };
       myChart.setOption(tchartOptions)
-    },
-    setData(minData) {
-      let dataX = []
-      let dataY = []
-      minData.forEach(
-        (item, index) => {
-          dataX.push(item[0])
-          dataY.push(item[1])
-        }
-      )
-      this.abs(dataY)
-      let max = this.min
-      let min = this.max
-      console.log(this.max, this.min);
-      dataX = dataX.map(
-        i => this.fmttime(i)
-      )
-      myChart.setOption({
-        tooltip: {
-          trigger: 'axis',
-          position: function (pt) {
-            return [pt[0], '10%'];
-          }
-        },
-        title: {
-          left: 'center',
-          text: '大数据量面积图'
-        },
-        toolbox: {
-          feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          // data: dataX,
-          // min: 'dataMin',
-          // max: 'dataMax',
-          data: date
-        },
-        yAxis: {
-          type: 'value',
-          boundaryGap: [0, '100%'],
-          min: min,
-          max: max
-          // data: this.minData
-        },
-        dataZoom: [{
-          type: 'inside'
-          // start: 0,
-          // end: 10
-        // }, {
-        //   // start: 0,
-        //   // end: 10,
-        //   handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-        //   handleSize: '80%',
-        //   handleStyle: {
-        //     color: '#fff',
-        //     shadowBlur: 3,
-        //     shadowColor: 'rgba(0, 0, 0, 0.6)',
-        //     shadowOffsetX: 2,
-        //     shadowOffsetY: 2
-        //   }
-        }],
-        series: [
-          {
-            name: '模拟数据',
-            type: 'line',
-            smooth: true,
-            symbol: 'none',
-            sampling: 'average',
-            itemStyle: {
-              color: 'rgb(255, 70, 131)'
-            },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                offset: 0,
-                color: 'rgb(255, 158, 68)'
-              }, {
-                offset: 1,
-                color: 'rgb(255, 70, 131)'
-              }])
-            },
-            data: dataY
-          }
-        ]
-      })
     }
   },
 
@@ -412,6 +381,6 @@ export default {
 <style lang='scss' scoped>
 #eline{
     width: 100vw;
-    height: 60vw;
+    height: 72vw;
 }
 </style>
