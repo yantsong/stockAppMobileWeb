@@ -2,6 +2,14 @@ import axios from 'axios'
 
 const baseURL = process.env.BASE_URL
 /**
+   * 获取k线1日
+   */
+export const getSSKlineDay = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/kline?candle_period=6&data_count=256&fields=turnover_ratio,min_time,open_px,close_px,high_px,low_px,business_amount,business_balance,ma5,ma10,ma20,ma60&prod_code=000001.SS&adjust_price_type=forward`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
    * 获取A股分时
    */
 export const getSSMin = () => {
