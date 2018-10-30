@@ -10,11 +10,35 @@ export const getSSKlineDay = () => {
   ).then(res => Promise.resolve(res.data))
 }
 /**
+   * 获取周k线
+   */
+export const getSSKlineWeek = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/kline?candle_period=7&data_count=256&fields=turnover_ratio,min_time,open_px,close_px,high_px,low_px,business_amount,business_balance,ma5,ma10,ma20,ma60&prod_code=000001.SS&adjust_price_type=forward`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
+   * 获取月k线
+   */
+export const getSSKlineMonth = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/kline?candle_period=8&data_count=256&fields=turnover_ratio,min_time,open_px,close_px,high_px,low_px,business_amount,business_balance,ma5,ma10,ma20,ma60&prod_code=000001.SS&adjust_price_type=forward`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
    * 获取A股分时
    */
 export const getSSMin = () => {
   return axios.get(
     `https://mdc.wallstreetcn.com/trend?fields=min_time,last_px,avg_px,business_amount,business_balance&prod_code=000001.SS`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
+   * 获取A股今日信息
+   */
+export const getSSToday = () => {
+  return axios.get(
+    `https://wows-api.wallstreetcn.com/real?fields=prod_name,trade_status,update_time,last_px,px_change,px_change_rate,preclose_px,open_px,high_px,low_px,amplitude,turnover_ratio,pe_rate,dyn_pb_rate,market_value,circulation_value,business_amount,business_balance,hq_type_code,securities_type,volume_ratio,circulation_amount,total_shares,bps&en_prod_code=000001.SS`
   ).then(res => Promise.resolve(res.data))
 }
 export default {

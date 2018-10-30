@@ -12,16 +12,15 @@
 </style>
 
 <script>
-import {getSSKlineDay} from '@/service/stocksApi'
 let echarts = require('echarts/lib/echarts')
 require('echarts/lib/chart/line')
+require('echarts/lib/component/title');
 require('echarts/lib/chart/candlestick')
 require('echarts/lib/chart/bar')
 require('echarts/lib/component/markLine')
+require("echarts/lib/component/markPoint")
 require('echarts/lib/component/dataZoom')
 let myChart
-const dataCount = 69
-const total = 256
 
 // const seriesLineColor = ['#3165c3', '#a5a5a5', '#38b6fc'];
 
@@ -41,7 +40,12 @@ export default {
       min: ''
     }
   },
-
+  props: {
+    // klineapi 当前获取数据的api 日线 周线 或者K线
+    klineapi: {},
+    // count 当前坐标轴一段的数据量,即从当前屏幕 坐标轴开始 到 结束中间数据数量 ,interval 是总的分割线数量 interval / 总数据量 = 当前屏幕线数/当前屏幕数据量count
+    count: {default: 69}
+  },
   created() {
     this.getData()
   },
@@ -52,24 +56,26 @@ export default {
     // this.getData().then()
   },
   watch: {
-    minData: function() {
-    //   this.computeMaxMin()
-      this.computedataLineXY()
+    klineapi: function() {
+      this.getData()
     },
     // eslint-disable-next-line
     dataKLineY: function(){
       this.empdata()
     }
   },
-
   methods: {
     getData() {
-      return getSSKlineDay().then(
+      return this.klineapi().then(
         res => {
           console.log(res.data.candle['000001.SS']);
-          //   this.pre_px = Number(res.data.real.pre_close_px.toFixed(2))
-          // this.minData = res.data.candle['000001.SS'].splice(-dataCount)
-          this.minData = res.data.candle['000001.SS']
+          let minData = res.data.candle['000001.SS']
+          if (minData.length < 200) {
+            this.minData = minData.splice(-128)
+          } else {
+            this.minData = minData
+          }
+          this.computedataLineXY()
           return Promise.resolve(res.data.candle['000001.SS'])
         }
       )
@@ -98,6 +104,7 @@ export default {
     //   let initnumber = 0
     //   let colorNumber = 0
       let minData = this.minData
+
       let dataKLineX = []
       let dataKLineY = []
       //   let dataBarY = []
@@ -140,9 +147,12 @@ export default {
     //   this.datalinePre = datalinePre
     },
     empdata() {
-      //   app.title = '2015 年上证指数';
       let rawData = this.minData
-      console.log(this.minData);
+      const dataCount = this.count
+      const total = this.minData.length
+      const startValue = total - dataCount
+      const endValue = total - 1
+      console.log(startValue, endValue);
       function calculateMA(dayCount, data) {
         return data.map(
           i => i[dayCount]
@@ -169,9 +179,36 @@ export default {
       var data = rawData.map(function (item) {
         return [+item[1], +item[2], +item[4], +item[3]];
       });
-      console.log(total - dataCount);
       var option = {
-
+        title: [
+          {
+            text: `●MA5 ${rawData[total - 1][8]}`,
+            textStyle: {
+              color: '#ffb041',
+              fontSize: 12,
+              fontWeight: 400
+            },
+            padding: [0, 0, 0, 0]
+          },
+          {
+            text: `●MA10 ${rawData[total - 1][8]}`,
+            textStyle: {
+              color: '#26a5ff',
+              fontSize: 12,
+              fontWeight: 400
+            },
+            padding: [0, 0, 0, 100]
+          },
+          {
+            text: `●MA20 ${rawData[total - 1][8]}`,
+            textStyle: {
+              color: '#ff40bf',
+              fontWeight: 400,
+              fontSize: 12
+            },
+            padding: [0, 0, 0, 202]
+          }
+        ],
         // backgroundColor: '#21202D',
         legend: {
           data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30'],
@@ -196,16 +233,14 @@ export default {
           type: 'category',
           data: dates,
           axisLine: { lineStyle: { color: '#8392A5' } },
-          splitNumber: 3,
+          // splitNumber: 3,
           boundaryGap: false,
           splitLine: {
             show: true,
             lineStyle: {
               color: '#eff0f2'
-            }
-            // interval: (index, val) => {
-            //   if (index === 68) return false
-            // }
+            },
+            interval: 16
           },
           axisTick: {
             show: false
@@ -213,6 +248,11 @@ export default {
           axisLabel: {
             interval: 16,
             formatter: (value, index) => {
+              // return value
+              // if (index === 0) return '0000000000'
+              // else {
+              //   return value
+              // }
               if (index === dataCount - 1) {
                 return `${value} 2018083`
               } else if (index === 0) {
@@ -241,13 +281,20 @@ export default {
         yAxis: [{
           scale: true,
           show: false,
+          // padding: [100, 0, 100, 0],
           axisLine: { lineStyle: { color: '#8392A5' } },
-          splitLine: { show: false },
-          boundaryGap: true,
+          boundaryGap: ['1.5%', '1.5%'],
           axisLabel: {
             inside: true
             // show: false
           }
+          // splitNumber: 4,
+          // splitLine: {
+          //   show: true,
+          //   lineStyle: {
+          //     color: '#eff0f2'
+          //   }
+          // }
         },
         {
           scale: true,
@@ -265,7 +312,7 @@ export default {
           height: '72%',
           // width: '99%',
           top: '0px',
-          // padding: [0, 1, 0, 0],
+          padding: [20, 0, 0, 0],
           containLabel: true
         }, {
           height: '30%',
@@ -288,6 +335,50 @@ export default {
                 borderColor: '#f3564d',
                 borderColor0: '#1cbf7b'
               }
+            },
+            markPoint: {
+              data: [
+                {
+                  name: 'max',
+                  type: 'max',
+                  symbol: 'circle',
+                  symbolOffset: [25, '-200%'],
+                  symbolSize: 1,
+                  valueDim: 'highest',
+                  label: {
+                    show: true,
+                    color: '#333',
+                    fontSize: 10,
+                    formatter: (p) => {
+                      console.log(p);
+                      return `...${p.data.value.toFixed(2)}`
+                    }
+                  },
+                  itemStyle: {
+                    normal: {color: 'rgb(41,60,85)'}
+                  }
+                },
+                {
+                  name: 'min',
+                  type: 'min',
+                  symbol: 'circle',
+                  symbolOffset: [-25, '-200%'],
+                  symbolSize: 1,
+                  valueDim: 'lowest',
+                  label: {
+                    show: true,
+                    color: '#333',
+                    fontSize: 10,
+                    formatter: (p) => {
+                      console.log(p);
+                      return `${p.data.value.toFixed(2)}...`
+                    }
+                  },
+                  itemStyle: {
+                    normal: {color: 'rgb(41,60,85)'}
+                  }
+                }
+              ]
             }
           },
           {
@@ -330,18 +421,6 @@ export default {
             }
           },
           {
-            name: 'MA30',
-            type: 'line',
-            data: calculateMA(30, data),
-            smooth: true,
-            showSymbol: false,
-            lineStyle: {
-              normal: {
-                width: 1
-              }
-            }
-          },
-          {
             type: 'bar',
             xAxisIndex: 1,
             yAxisIndex: 1,
@@ -356,8 +435,10 @@ export default {
             type: 'inside',
             xAxisIndex: [0, 1],
             // yAxisIndex: [0, 6],
-            startValue: total - dataCount,
-            endValue: total - 1,
+            startValue,
+            endValue,
+            minValueSpan: 69,
+            maxValueSpan: 69,
             filterMode: 'filter'
           }
         ]
