@@ -35,7 +35,7 @@
 <script>
 import MinLine from '@/components/line/MinLine'
 import KLineDay from '@/components/line/KLineDay'
-import SSInfoTitle from './SSINfoTitle'
+import SSInfoTitle from './SSInfoTitle'
 import {getSSToday, getSSKlineDay, getSSKlineWeek, getSSKlineMonth} from '@/service/stocksApi'
 export default {
   data () {
