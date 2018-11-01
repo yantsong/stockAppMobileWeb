@@ -43,8 +43,10 @@ export default {
   props: {
     // klineapi 当前获取数据的api 日线 周线 或者K线
     klineapi: {},
-    // count 当前坐标轴一段的数据量,即从当前屏幕 坐标轴开始 到 结束中间数据数量 ,interval 是总的分割线数量 interval / 总数据量 = 当前屏幕线数/当前屏幕数据量count
-    count: {default: 69}
+    // type: day,week,month
+    type: {
+      default: 'day'
+    }
   },
   created() {
     this.getData()
@@ -68,10 +70,9 @@ export default {
     getData() {
       return this.klineapi().then(
         res => {
-          console.log(res.data.candle['000001.SS']);
           let minData = res.data.candle['000001.SS']
-          if (minData.length < 200) {
-            this.minData = minData.splice(-128)
+          if (this.type === 'month') {
+            this.minData = minData.splice(-137)
           } else {
             this.minData = minData
           }
@@ -101,67 +102,97 @@ export default {
       }
     },
     computedataLineXY() {
-    //   let initnumber = 0
-    //   let colorNumber = 0
+      // 计算Y轴的坐标
       let minData = this.minData
 
-      let dataKLineX = []
-      let dataKLineY = []
-      //   let dataBarY = []
-      //   let datalinePre = []
-      minData.forEach(
-        (item, index) => {
-          // let objx = item[0].toString().slice(-4)
-          let objx = {value: item[0],
-            label: {
-              show: true
-            },
-            splitLine: {
-              show: true
-            }}
-
-          let objy = {value: [item[1], item[2], item[4], item[3]],
-            itemStyle: {
-              normal: {show: false},
-              emphasis: {show: false}
-            }
-          }
-          //   let objbar = {value: item[3] - initnumber,
-          //     color: item[1] - colorNumber,
-          //     itemStyle: {
-          //       color: item[1] > colorNumber ? '#f3564d' : '#1cbf7b'
-          //     }
-          //   }
-          dataKLineX.push(objx)
-          dataKLineY.push(objy)
-        //   dataBarY.push(objbar)
-        //   datalinePre.push(item[2].toFixed(2))
-        //   initnumber = item[3]
-        //   colorNumber = item[1]
-        }
+      let dataKLineY = minData.map(
+        item => [item[1], item[2], item[4], item[3]]
       )
-      console.log(dataKLineY);
-      this.dataKLineX = dataKLineX
       this.dataKLineY = dataKLineY
-    //   this.dataBarY = dataBarY
-    //   this.datalinePre = datalinePre
     },
     empdata() {
+      // 渲染实例
       let rawData = this.minData
-      const dataCount = this.count
+      // symbol位置
+      const symbolOffset = {}
+      // 定义一个format函数
+      let formatter
+      // type
+      const {type} = this
+      // 当前屏幕内要展示的数据量
+      const dataCount = 69
+      // 当前数据总量
       const total = this.minData.length
+      // 当前屏幕起始位置(index)
       const startValue = total - dataCount
+      // 当前屏幕结束位置(index)
       const endValue = total - 1
-      console.log(startValue, endValue);
+      // 计算MA线
       function calculateMA(dayCount, data) {
         return data.map(
           i => i[dayCount]
         );
       }
-
+      // X轴fommater函数 日周K的情况
+      function formatterDW (value, index) {
+        // 在当前屏幕的刻度首位做特殊处理
+        if (index === dataCount - 1) {
+          return `${value} 2018083`
+        } else if (index === 0) {
+          return `2018083 ${value}`
+        } else {
+          return value
+        }
+      }
+      // X轴fommater函数 月K的情况
+      function formatterMonth (val, index) {
+        let value = val.slice(0, 6)
+        value = value.replace(/(\d{4})/, '$1-')
+        // 在当前屏幕的刻度首位做特殊处理
+        if (index === dataCount - 1) {
+          return `${value} 201808`
+        } else if (index === 0) {
+          return `201808 ${value}`
+        } else {
+          return value
+        }
+      }
+      // X轴fommater函数 5 15 30 分线情况
+      function formatterMin(val, index) {
+        let value = val.slice(-4)
+        value = value.replace(/(^\d{2})/, '$1:')
+        // 在当前屏幕的刻度首位做特殊处理
+        if (index === dataCount - 1) {
+          return `${value} 2018`
+        } else if (index === 0) {
+          return `2018 ${value}`
+        } else {
+          return value
+        }
+      }
+      // 根据type不同做一些不同处理
+      function typeFilter(type) {
+        // 5 15 30 分线做处理
+        if (/min/.test(type)) {
+          formatter = formatterMin
+        } else if (type === 'month') {
+          formatter = formatterMonth
+        } else {
+          formatter = formatterDW
+        }
+        if (type === 'month') {
+          symbolOffset.max = [25, '-200%']
+          symbolOffset.min = [25, '-200%']
+        } else {
+          symbolOffset.max = [25, '-200%']
+          symbolOffset.min = [-25, '-200%']
+        }
+      }
+      // x轴坐标
       var dates = rawData.map(function (item) {
         return item[0];
       });
+      // 柱状图Y轴数据计算
       function dataBarY (data) {
         return data.map(
           i => {
@@ -175,11 +206,13 @@ export default {
           }
         )
       }
-
-      var data = rawData.map(function (item) {
-        return [+item[1], +item[2], +item[4], +item[3]];
-      });
+      // 根据type处理配置项
+      typeFilter(type)
+      // data初始化
+      var data = this.dataKLineY
+      // echat配置
       var option = {
+        // title设置
         title: [
           {
             text: `●MA5 ${rawData[total - 1][8]}`,
@@ -209,14 +242,10 @@ export default {
             padding: [0, 0, 0, 202]
           }
         ],
-        // backgroundColor: '#21202D',
+        // 图例,暂无用
         legend: {
-          data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30'],
-          inactiveColor: '#777',
-          textStyle: {
-            color: '#fff'
-          }
         },
+        // 提示框
         tooltip: {
           trigger: 'axis',
           axisPointer: {
@@ -229,38 +258,35 @@ export default {
             }
           }
         },
+        // X轴配置
         xAxis: [{
+          // 类型:类目轴
           type: 'category',
+          // X轴数据
           data: dates,
+          // 轴线样式
           axisLine: { lineStyle: { color: '#8392A5' } },
-          // splitNumber: 3,
+          // 两边留白
           boundaryGap: false,
+          // 分割线设置
           splitLine: {
             show: true,
             lineStyle: {
               color: '#eff0f2'
             },
+            // 间隔设置
             interval: 16
           },
+          // 刻度
           axisTick: {
             show: false
           },
+          // 刻度的label
           axisLabel: {
+            // 隔多少个项显示一个标签
             interval: 16,
-            formatter: (value, index) => {
-              // return value
-              // if (index === 0) return '0000000000'
-              // else {
-              //   return value
-              // }
-              if (index === dataCount - 1) {
-                return `${value} 2018083`
-              } else if (index === 0) {
-                return value + value
-              } else {
-                return value
-              }
-            }
+            // 要显示的内容格式
+            formatter: formatter
           }
         },
         {
@@ -278,23 +304,16 @@ export default {
           // splitNumber: 20
         }
         ],
+        // Y轴设置 data相关配置项在series
         yAxis: [{
           scale: true,
           show: false,
-          // padding: [100, 0, 100, 0],
           axisLine: { lineStyle: { color: '#8392A5' } },
           boundaryGap: ['1.5%', '1.5%'],
           axisLabel: {
             inside: true
             // show: false
           }
-          // splitNumber: 4,
-          // splitLine: {
-          //   show: true,
-          //   lineStyle: {
-          //     color: '#eff0f2'
-          //   }
-          // }
         },
         {
           scale: true,
@@ -306,13 +325,13 @@ export default {
           splitLine: {show: false}
         }
         ],
+        // 布局设置
         grid: [{
           left: '0px',
           right: '2px',
           height: '72%',
           // width: '99%',
           top: '0px',
-          padding: [20, 0, 0, 0],
           containLabel: true
         }, {
           height: '30%',
@@ -325,8 +344,10 @@ export default {
         animation: false,
         series: [
           {
+            // 类型k线图
             type: 'candlestick',
             name: '日K',
+            // K线图数据 open close lowest highest
             data: data,
             itemStyle: {
               normal: {
@@ -337,12 +358,17 @@ export default {
               }
             },
             markPoint: {
+              // 标记点 此处是标识最高和最低的 ...xxxx
               data: [
                 {
+                  // 高点
                   name: 'max',
                   type: 'max',
+                  // symbol类型 这里是点
                   symbol: 'circle',
-                  symbolOffset: [25, '-200%'],
+                  // 偏移
+                  symbolOffset: symbolOffset.max,
+                  // SIZE 这里放到很小...
                   symbolSize: 1,
                   valueDim: 'highest',
                   label: {
@@ -350,7 +376,6 @@ export default {
                     color: '#333',
                     fontSize: 10,
                     formatter: (p) => {
-                      console.log(p);
                       return `...${p.data.value.toFixed(2)}`
                     }
                   },
@@ -362,7 +387,7 @@ export default {
                   name: 'min',
                   type: 'min',
                   symbol: 'circle',
-                  symbolOffset: [-25, '-200%'],
+                  symbolOffset: symbolOffset.min,
                   symbolSize: 1,
                   valueDim: 'lowest',
                   label: {
@@ -370,8 +395,10 @@ export default {
                     color: '#333',
                     fontSize: 10,
                     formatter: (p) => {
-                      console.log(p);
-                      return `${p.data.value.toFixed(2)}...`
+                      if (type === 'month') return `...${p.data.value.toFixed(2)}`
+                      else {
+                        return `${p.data.value.toFixed(2)}...`
+                      }
                     }
                   },
                   itemStyle: {
@@ -381,6 +408,7 @@ export default {
               ]
             }
           },
+          // ma5线
           {
             name: 'MA5',
             type: 'line',
@@ -394,6 +422,7 @@ export default {
               }
             }
           },
+          // ma10线
           {
             name: 'MA10',
             type: 'line',
@@ -420,25 +449,27 @@ export default {
               }
             }
           },
+          // 柱状图数据
           {
             type: 'bar',
             xAxisIndex: 1,
             yAxisIndex: 1,
             barCategoryGap: 1.5,
             data: dataBarY(rawData),
+            // 最大和最小
             max: 'dataMax',
             min: 'dataMin'
           }
         ],
+        // 缩放配置项
         dataZoom: [
           {
             type: 'inside',
+            // 要缩放的轴[序号]
             xAxisIndex: [0, 1],
             // yAxisIndex: [0, 6],
             startValue,
             endValue,
-            minValueSpan: 69,
-            maxValueSpan: 69,
             filterMode: 'filter'
           }
         ]

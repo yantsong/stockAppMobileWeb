@@ -26,6 +26,38 @@ export const getSSKlineMonth = () => {
   ).then(res => Promise.resolve(res.data))
 }
 /**
+   * 获取5fen线
+   */
+export const getSSKline5Min = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/kline?candle_period=2&data_count=256&fields=turnover_ratio,min_time,open_px,close_px,high_px,low_px,business_amount,business_balance,ma5,ma10,ma20,ma60&prod_code=000001.SS&adjust_price_type=forward`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
+   * 获取15fen线
+   */
+export const getSSKline15Min = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/kline?candle_period=3&data_count=256&fields=turnover_ratio,min_time,open_px,close_px,high_px,low_px,business_amount,business_balance,ma5,ma10,ma20,ma60&prod_code=000001.SS&adjust_price_type=forward`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
+   * 获取30fen线
+   */
+export const getSSKline30Min = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/kline?candle_period=4&data_count=256&fields=turnover_ratio,min_time,open_px,close_px,high_px,low_px,business_amount,business_balance,ma5,ma10,ma20,ma60&prod_code=000001.SS&adjust_price_type=forward`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
+   * 获取60fen线
+   */
+export const getSSKline60Min = () => {
+  return axios.get(
+    `https://mdc.wallstreetcn.com/kline?candle_period=5&data_count=256&fields=turnover_ratio,min_time,open_px,close_px,high_px,low_px,business_amount,business_balance,ma5,ma10,ma20,ma60&prod_code=000001.SS&adjust_price_type=forward`
+  ).then(res => Promise.resolve(res.data))
+}
+/**
    * 获取A股分时
    */
 export const getSSMin = () => {
