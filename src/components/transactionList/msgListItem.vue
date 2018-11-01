@@ -37,15 +37,14 @@ $green:#4da370;
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            height: 20px;
-            line-height: 20px;
+            height: 18px;
+            line-height: 18px;
             vertical-align: middle;;
             i{
-                display: inline-block;
-                width: 16px;
-                height: 16px;
+                width: 18px;
+                height: 18px;
                 background-color: #fff;
-                border: 4px solid $red;
+                border: 3px solid $red;
                 border-radius: 50%;
             }
             em{
@@ -54,8 +53,8 @@ $green:#4da370;
                 background-color: $red;
             }
             b{
-                width: 14px;
-                height: 14px;
+                width: 12px;
+                height: 12px;
                 border-radius: 50%;
                 background-color: $red;
             }
