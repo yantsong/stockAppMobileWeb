@@ -11,7 +11,11 @@
     <ul class="transaction-option-tab">
       <li :class="optionActive === index ? 'active' : ''"  @click="optionActive = index" v-for="(item,index) in  optionTabList" :key="index">{{item}}</li>
     </ul>
+    <keep-alive>
     <TransactionList v-if="optionActive == 0"></TransactionList>
+    <StockTransaction v-if="optionActive == 1"></StockTransaction>
+    </keep-alive>
+    <photoswiper></photoswiper>
  </div>
 </template>
 <style lang='scss' scoped>
@@ -60,9 +64,11 @@
 
 <script>
 import MinLine from '@/components/line/MinLine'
+import photoswiper from "@/components/photoswiper";
 import KLineDay from '@/components/line/KLineDay'
 import SSInfoTitle from './SSInfoTitle'
 import TransactionList from '@/components/transactionList/transactionList'
+import StockTransaction from '@/components/stockTransaction/stockTransaction'
 import {getSSToday, getSSKlineDay, getSSKlineWeek, getSSKlineMonth, getSSKline5Min, getSSKline15Min, getSSKline30Min, getSSKline60Min} from '@/service/stocksApi'
 export default {
   data () {
@@ -101,7 +107,7 @@ export default {
   created() {
     getSSToday().then(
       res => {
-        this.sstoday = res.data.snapshot['000001.SS']
+        this.sstoday = res.data.snapshot['000001.SS'] || []
       }
     )
   },
@@ -123,7 +129,7 @@ export default {
 
   computed: {},
 
-  components: {MinLine, KLineDay, SSInfoTitle, TransactionList}
+  components: {MinLine, KLineDay, SSInfoTitle, TransactionList, StockTransaction, photoswiper}
 
 }
 </script>

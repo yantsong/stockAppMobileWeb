@@ -79,7 +79,7 @@ export default {
       )
       if (difference >= this.difference) {
         this.max = (this.pre_px + difference).toFixed(2)
-        this.min = this.pre_px - difference
+        this.min = (this.pre_px - difference).toFixed(2)
         this.rate = (((this.max / this.pre_px) - 1) * 100).toFixed(2) + '%'
         this.difference = difference
       }

@@ -9,16 +9,17 @@
         </span>
         <span class="msg-list-item-time-text">{{createdTime}}</span>
         <span v-if="bkjInfo.length" class="msg-list-item-time-bkjif">{{bkjInfo[0].Name}}</span>
-        <span v-if="bkjInfo.length" class="msg-list-item-time-bkjrt" :class="colorName(bkjInfo[0].Rate)">{{bkjInfo[0].Rate&&(bkjInfo[0].Rate>0?`+${bkjInfo[0].Rate}`:bkjInfo[0].Rate)}}%</span>
+        <span v-if="bkjInfo.length" class="msg-list-item-time-bkjrt" :class="colorName(rate)">{{(rate>0 ? `+${rate}` : rate)}}%</span>
     </div>
     <div class="msg-list-item-title">
         {{msg.Title}}
     </div>
-    <div class="msg-list-item-summary" v-if="msg.Summary">
+    <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">
         {{msg.Summary}}
     </div>
     <img @click="showImage(msg.Image)" :data-src="msg.Image" :ref="`image`" class="msg-list-item-summary-img " v-if="msg && msg.Image" :src="msg.Image" alt="" />
     <StockTrend v-if="stocks" :stocks = "stocks" :stocksPool = "stocksPool" :fields="fields" class="msg-list-item-stock"></StockTrend>
+    <image-modal-fake v-if="msg.Image" :src="msg.Image" :visible="visible" @hide="hideImageModal" />
 
  </div>
 </template>
@@ -37,14 +38,14 @@ $green:#4da370;
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            height: 18px;
-            line-height: 18px;
+            height: 16px;
+            line-height: 16px;
             vertical-align: middle;;
             i{
-                width: 18px;
-                height: 18px;
+                width: 16px;
+                height: 16px;
                 background-color: #fff;
-                border: 3px solid $red;
+                border: 4px solid $red;
                 border-radius: 50%;
             }
             em{
@@ -61,13 +62,13 @@ $green:#4da370;
         }
         &-text{
             font-weight: 500;
-            margin-left: 24px;
+            margin-left: 6px;
             font-size: 22px;
             color:#808080;
         }
         &-bkjif{
             margin: 0 26px 0 16px;
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 500;
             color: #333;
         }
@@ -75,7 +76,7 @@ $green:#4da370;
             padding: 6px 6px;
             color:#fff;
             font-weight: 500;
-            font-size: 30px;
+            font-size: 28px;
             border-radius: 8px;
             &.color-red{
                 background-color:$red;
@@ -91,13 +92,22 @@ $green:#4da370;
         color:#333
     }
     &-summary{
-        padding: 36px 0 30px;
+        margin: 36px 0 30px;
         font-size: 26px;
+        line-height: 40px;
         color:#828282;
         &-img{
-            // margin-left: 10%;
-            max-width: 80%;
+            max-width:600px;
+            max-height: 350px;
         }
+        &.line-clamp {
+        // max-height: 120px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+      }
     }
     &-stock{
         padding: 24px 0 10px;
@@ -113,13 +123,18 @@ $green:#4da370;
 import format from "date-fns/format";
 import stockApi from '@/service/stocksApi'
 import StockTrend from '@/components/stockTrend/StockTrend'
+import { getDate } from 'date-fns';
+import PhotoSwipe from "photoswipe";
+import ImageModalFake from "@/components/ImageModalFake";
 
 export default {
   data () {
     return {
       bkjInfo: this.msg.BkjInfoArr,
       stocksPool: {},
-      fields: []
+      fields: [],
+      rate: 0.0,
+      visible: false
     };
   },
   props: {
@@ -143,8 +158,7 @@ export default {
       stockApi.getPlatNormalInfo(bkjId).then(
         res => {
           if (res.code === 20000) {
-            this.bkjInfo[0].Rate = res.data.core_pcp
-            console.log(this.stocks);
+            this.rate = res.data.core_pcp.toFixed(2)
           }
         }
       )
@@ -169,12 +183,54 @@ export default {
       } else {
         return 'color-green'
       }
+    },
+    showImage(image) {
+      this.visible = true
+      // $('html').addClass('hidden')
+      let i = this.$refs.image;
+      var pswpElement = document.querySelectorAll(".pswp")[0];
+
+      // build items array
+      var items = [
+        {
+          src: image,
+          w: i.naturalWidth,
+          h: i.naturalHeight
+        }
+      ];
+      // define options (if needed)
+      var options = {
+        // history & focus options are disabled on CodePen
+        history: false,
+        focus: false,
+        bgOpacity: 0.8,
+        captionEl: false,
+        tapToClose: true,
+        shareEl: false,
+        fullscreenEl: false,
+        showAnimationDuration: 0,
+        hideAnimationDuration: 0
+      };
+
+      var gallery = new PhotoSwipe(
+        pswpElement,
+        // eslint-disable-next-line
+        PhotoSwipeUI_Default,
+        items,
+        options
+      );
+      gallery.init();
+    },
+    hideImageModal() {
+      this.visible = false;
+      // $("html").removeClass("hidden");
     }
   },
 
   computed: {
     createdTime() {
-      return format(new Date(this.msg.CreatedAt), "HH:mm");
+      let today = getDate(this.msg.CreatedAt) === getDate(new Date())
+      return today ? format(new Date(this.msg.CreatedAt), "HH:mm") : format(new Date(this.msg.CreatedAt), "MM-DD HH:mm")
     },
     stocks() {
       return this.msg.Stocks && this.msg.Stocks.map(
@@ -187,10 +243,32 @@ export default {
         }
       )
     }
+    // cut() {
+
+    // }
+    // rate() {
+    //   return this.bkjInfo[0].Rate
+    // }
   },
 
-  components: {StockTrend},
+  components: {StockTrend, ImageModalFake},
   watch: {
+  },
+  directives: {
+    // 超出省略号指令 @Parmas :Object {class:[String],height:[Number]}
+    cut: {
+      inserted: function (el, binding) {
+        let height = binding.value.height || 120
+        let cutClass = binding.value.class
+        let cut = el.offsetHeight > height
+        cut && el.classList.add(cutClass)
+
+        el.onclick = () => {
+          cut = !cut
+          cut ? el.classList.add(cutClass) : el.classList.remove(cutClass)
+        }
+      }
+    }
   }
 
 }
