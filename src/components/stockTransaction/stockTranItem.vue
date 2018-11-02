@@ -111,7 +111,7 @@ $green:#4da370;
 }
 </style>
 <script>
-import format from "date-fns/format";
+// import format from "date-fns/format";
 
 export default {
   data () {
@@ -143,7 +143,9 @@ export default {
   computed: {
     createdTime() {
       let time = this.stocks[6]
-      return format(new Date(time), "HH:mm");
+      console.log(this.stocks[6]);
+
+      return time.slice(10, 16)
     },
     rate() {
       return this.stocks[3].pcp
