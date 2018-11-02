@@ -19,7 +19,7 @@
     </div>
     <img @click="showImage(msg.Image)" :data-src="msg.Image" :ref="`image`" class="msg-list-item-summary-img " v-if="msg && msg.Image" :src="msg.Image" alt="" />
     <StockTrend v-if="stocks" :stocks = "stocks" :stocksPool = "stocksPool" :fields="fields" class="msg-list-item-stock"></StockTrend>
-    <image-modal-fake v-if="msg.Image" :src="msg.Image" :visible="visible" @hide="hideImageModal" />
+    <!-- <image-modal-fake v-if="msg.Image" :src="msg.Image" :visible="visible" @hide="hideImageModal" /> -->
 
  </div>
 </template>
@@ -125,7 +125,7 @@ import stockApi from '@/service/stocksApi'
 import StockTrend from '@/components/stockTrend/StockTrend'
 import { getDate } from 'date-fns';
 import PhotoSwipe from "photoswipe";
-import ImageModalFake from "@/components/ImageModalFake";
+// import ImageModalFake from "@/components/ImageModalFake";
 
 export default {
   data () {
@@ -251,7 +251,7 @@ export default {
     // }
   },
 
-  components: {StockTrend, ImageModalFake},
+  components: {StockTrend},
   watch: {
   },
   directives: {

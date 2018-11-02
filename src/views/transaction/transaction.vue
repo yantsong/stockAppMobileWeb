@@ -15,7 +15,7 @@
     <TransactionList v-if="optionActive == 0"></TransactionList>
     <StockTransaction v-if="optionActive == 1"></StockTransaction>
     </keep-alive>
-    <photoswiper></photoswiper>
+    <!-- <photoswiper></photoswiper> -->
  </div>
 </template>
 <style lang='scss' scoped>
@@ -64,7 +64,7 @@
 
 <script>
 import MinLine from '@/components/line/MinLine'
-import photoswiper from "@/components/photoswiper";
+// import photoswiper from "@/components/photoswiper";
 import KLineDay from '@/components/line/KLineDay'
 import SSInfoTitle from './SSInfoTitle'
 import TransactionList from '@/components/transactionList/transactionList'
@@ -129,7 +129,7 @@ export default {
 
   computed: {},
 
-  components: {MinLine, KLineDay, SSInfoTitle, TransactionList, StockTransaction, photoswiper}
+  components: {MinLine, KLineDay, SSInfoTitle, TransactionList, StockTransaction}
 
 }
 </script>
