@@ -17,7 +17,7 @@
     <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">
         {{msg.Summary}}
     </div>
-    <img @click="showImage(msg.Image)" :data-src="msg.Image" :ref="`image`" class="msg-list-item-summary-img " v-if="msg && msg.Image" :src="msg.Image" alt="" />
+    <img   v-if="msg && msg.Image" :ref="`image`" class="msg-list-item-summary-img " :src="msg.Image" alt="" />
     <StockTrend v-if="stocks" :stocks = "stocks" :stocksPool = "stocksPool" :fields="fields" class="msg-list-item-stock"></StockTrend>
     <!-- <image-modal-fake v-if="msg.Image" :src="msg.Image" :visible="visible" @hide="hideImageModal" /> -->
 
@@ -101,7 +101,8 @@ $green:#4da370;
             max-height: 350px;
         }
         &.line-clamp {
-        // max-height: 120px;
+        max-height: 120px;
+        text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
@@ -124,7 +125,7 @@ import format from "date-fns/format";
 import stockApi from '@/service/stocksApi'
 import StockTrend from '@/components/stockTrend/StockTrend'
 import { getDate } from 'date-fns';
-import PhotoSwipe from "photoswipe";
+// import PhotoSwipe from "photoswipe";
 // import ImageModalFake from "@/components/ImageModalFake";
 
 export default {
@@ -184,43 +185,43 @@ export default {
         return 'color-green'
       }
     },
-    showImage(image) {
-      this.visible = true
-      // $('html').addClass('hidden')
-      let i = this.$refs.image;
-      var pswpElement = document.querySelectorAll(".pswp")[0];
+    // showImage(image) {
+    //   this.visible = true
+    //   // $('html').addClass('hidden')
+    //   let i = this.$refs.image;
+    //   var pswpElement = document.querySelectorAll(".pswp")[0];
 
-      // build items array
-      var items = [
-        {
-          src: image,
-          w: i.naturalWidth,
-          h: i.naturalHeight
-        }
-      ];
-      // define options (if needed)
-      var options = {
-        // history & focus options are disabled on CodePen
-        history: false,
-        focus: false,
-        bgOpacity: 0.8,
-        captionEl: false,
-        tapToClose: true,
-        shareEl: false,
-        fullscreenEl: false,
-        showAnimationDuration: 0,
-        hideAnimationDuration: 0
-      };
+    //   // build items array
+    //   var items = [
+    //     {
+    //       src: image,
+    //       w: i.naturalWidth,
+    //       h: i.naturalHeight
+    //     }
+    //   ];
+    //   // define options (if needed)
+    //   var options = {
+    //     // history & focus options are disabled on CodePen
+    //     history: false,
+    //     focus: false,
+    //     bgOpacity: 0.8,
+    //     captionEl: false,
+    //     tapToClose: true,
+    //     shareEl: false,
+    //     fullscreenEl: false,
+    //     showAnimationDuration: 0,
+    //     hideAnimationDuration: 0
+    //   };
 
-      var gallery = new PhotoSwipe(
-        pswpElement,
-        // eslint-disable-next-line
-        PhotoSwipeUI_Default,
-        items,
-        options
-      );
-      gallery.init();
-    },
+    //   var gallery = new PhotoSwipe(
+    //     pswpElement,
+    //     // eslint-disable-next-line
+    //     PhotoSwipeUI_Default,
+    //     items,
+    //     options
+    //   );
+    //   gallery.init();
+    // },
     hideImageModal() {
       this.visible = false;
       // $("html").removeClass("hidden");
