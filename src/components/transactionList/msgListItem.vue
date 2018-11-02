@@ -97,8 +97,10 @@ $green:#4da370;
         line-height: 40px;
         color:#828282;
         &-img{
-            max-width:600px;
-            max-height: 350px;
+          width: 600px;
+          height: 350px;;
+            // max-width:600px;
+            // max-height: 350px;
         }
         &.line-clamp {
         max-height: 120px;
