@@ -14,10 +14,7 @@
     <div class="msg-list-item-title">
         {{msg.Title}}
     </div>
-    <!-- <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}"> -->
-    <div class="msg-list-item-summary " v-if="msg.Summary" :ref="msg.Id" >
-        <p class=" test-line-clamp">{{msg.Summary}}</p>
-    </div>
+    <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">
     <div class="msg-list-item-imgwrap">
       <img :src="msg.Image" />
     </div>
@@ -29,15 +26,6 @@
 <style lang='scss' scoped>
 $red:#e22e42;
 $green:#4da370;
- .test-line-clamp {
-   min-width: 1;
-    overflow : hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    word-break: break-all; /* 追加这一行代码 */
-      }
 .msg-list-item{
     padding: 0 16px;
     &-time{
@@ -114,7 +102,9 @@ $green:#4da370;
         text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
+    /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
         overflow: hidden;
         word-break: break-word;
       }
