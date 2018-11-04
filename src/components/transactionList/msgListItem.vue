@@ -18,7 +18,9 @@
     <div class="msg-list-item-summary test-line-clamp" v-if="msg.Summary" :ref="msg.Id" >
         {{msg.Summary}}
     </div>
-    <img   class="msg-list-item-summary-img " :src="msg.Image" />
+    <div class="msg-list-item-imgwrap">
+      <img :src="msg.Image" />
+    </div>
     <StockTrend v-if="stocks" :stocks = "stocks" :stocksPool = "stocksPool" :fields="fields" class="msg-list-item-stock"></StockTrend>
     <!-- <image-modal-fake v-if="msg.Image" :src="msg.Image" :visible="visible" @hide="hideImageModal" /> -->
 
@@ -28,7 +30,7 @@
 $red:#e22e42;
 $green:#4da370;
  .test-line-clamp {
-        max-height: 120px;
+        // max-height: 120px;
         display: -webkit-box;
         -webkit-line-clamp: 5;
         -webkit-box-orient: vertical;
@@ -110,12 +112,6 @@ $green:#4da370;
         font-size: 26px;
         line-height: 40px;
         color:#828282;
-        &-img{
-          // width: 600px;
-          // height: 350px;;
-            // max-width:600px;
-            max-height: 350px;
-        }
         &.line-clamp {
         width: 100%;
         max-height: 120px;
@@ -125,6 +121,12 @@ $green:#4da370;
         -webkit-box-orient: vertical;
         overflow: hidden;
         word-break: break-word;
+      }
+    }
+    &-imgwrap{
+      img{
+        width: 100%;
+        height: 100%;
       }
     }
     &-stock{
