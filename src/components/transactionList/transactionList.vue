@@ -127,9 +127,8 @@ export default {
   max-height: 120px;
     display: -webkit-box;
     -webkit-line-clamp: 5;
-    /* autoprefixer: off */
+    /*! autoprefixer: ignore next */
   -webkit-box-orient: vertical;
-  /* autoprefixer: on */
     overflow: hidden;
     line-height: 24px;
     font-size: 15px;
