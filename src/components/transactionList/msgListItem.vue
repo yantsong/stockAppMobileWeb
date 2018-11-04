@@ -16,7 +16,7 @@
     </div>
     <!-- <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}"> -->
     <div class="msg-list-item-summary " v-if="msg.Summary" :ref="msg.Id" >
-        <span class=" test-line-clamp">{{msg.Summary}}</span>
+        <p class=" test-line-clamp">{{msg.Summary}}</p>
     </div>
     <div class="msg-list-item-imgwrap">
       <img :src="msg.Image" />
@@ -30,7 +30,8 @@
 $red:#e22e42;
 $green:#4da370;
  .test-line-clamp {
-        overflow : hidden;
+   min-width: 1;
+    overflow : hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 1;
