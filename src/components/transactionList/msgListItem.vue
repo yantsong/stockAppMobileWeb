@@ -14,7 +14,8 @@
     <div class="msg-list-item-title">
         {{msg.Title}}
     </div>
-    <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">
+    <!-- <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}"> -->
+    <div class="msg-list-item-summary test-line-clamp" v-if="msg.Summary" :ref="msg.Id" >
         {{msg.Summary}}
     </div>
     <img   class="msg-list-item-summary-img " :src="msg.Image" />
@@ -26,6 +27,19 @@
 <style lang='scss' scoped>
 $red:#e22e42;
 $green:#4da370;
+ .test-line-clamp {
+        max-height: 120px;
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 24px;
+        font-size: 15px;
+        position: relative;
+        top: 0;
+        border: none;
+        word-break: break-word;
+      }
 .msg-list-item{
     padding: 0 16px;
     &-time{
@@ -100,10 +114,10 @@ $green:#4da370;
           // width: 600px;
           // height: 350px;;
             // max-width:600px;
-            // max-height: 350px;
+            max-height: 350px;
         }
         &.line-clamp {
-          width: 100%;
+        width: 100%;
         max-height: 120px;
         text-overflow: ellipsis;
         display: -webkit-box;
