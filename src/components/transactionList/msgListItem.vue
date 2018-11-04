@@ -30,17 +30,12 @@
 $red:#e22e42;
 $green:#4da370;
  .test-line-clamp {
-        // max-height: 120px;
-        display: -webkit-box;
-        -webkit-line-clamp: 5;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        line-height: 24px;
-        font-size: 15px;
-        position: relative;
-        top: 0;
-        border: none;
-        word-break: break-word;
+        overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    word-break: break-all; /* 追加这一行代码 */
       }
 .msg-list-item{
     padding: 0 16px;
