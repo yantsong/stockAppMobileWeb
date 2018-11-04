@@ -81,6 +81,7 @@
   },
   "browserslist": [
     "> 1%",
+    "Safari 6",
     "last 2 versions",
     "not ie <= 8"
   ]
