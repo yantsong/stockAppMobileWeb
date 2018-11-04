@@ -17,7 +17,7 @@
     <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">
         {{msg.Summary}}
     </div>
-    <img   v-if="msg && msg.Image" :ref="`image`" class="msg-list-item-summary-img " :src="msg.Image" alt="" width="80%"/>
+    <img   class="msg-list-item-summary-img " :src="msg.Image" />
     <StockTrend v-if="stocks" :stocks = "stocks" :stocksPool = "stocksPool" :fields="fields" class="msg-list-item-stock"></StockTrend>
     <!-- <image-modal-fake v-if="msg.Image" :src="msg.Image" :visible="visible" @hide="hideImageModal" /> -->
 
@@ -97,8 +97,8 @@ $green:#4da370;
         line-height: 40px;
         color:#828282;
         &-img{
-          width: 600px;
-          height: 350px;;
+          // width: 600px;
+          // height: 350px;;
             // max-width:600px;
             // max-height: 350px;
         }
