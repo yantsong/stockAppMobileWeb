@@ -15,8 +15,8 @@
         {{msg.Title}}
     </div>
     <!-- <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}"> -->
-    <div class="msg-list-item-summary test-line-clamp" v-if="msg.Summary" :ref="msg.Id" >
-        {{msg.Summary}}
+    <div class="msg-list-item-summary " v-if="msg.Summary" :ref="msg.Id" >
+        <span class=" test-line-clamp">{{msg.Summary}}</span>
     </div>
     <div class="msg-list-item-imgwrap">
       <img :src="msg.Image" />
