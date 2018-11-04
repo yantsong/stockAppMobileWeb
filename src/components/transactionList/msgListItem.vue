@@ -14,7 +14,7 @@
     <div class="msg-list-item-title">
         {{msg.Title}}
     </div>
-    <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">
+    <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">{{msg.Summary}}</div>
     <div class="msg-list-item-imgwrap">
       <img :src="msg.Image" />
     </div>
@@ -102,9 +102,9 @@ $green:#4da370;
         text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 3;
-    /*! autoprefixer: off */
-  -webkit-box-orient: vertical;
-  /*! autoprefixer: on */
+        /*! autoprefixer: off */
+        -webkit-box-orient: vertical;
+      /*! autoprefixer: on */
         overflow: hidden;
         word-break: break-word;
       }
