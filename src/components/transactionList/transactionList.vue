@@ -1,6 +1,7 @@
 <!-- 大盘异动列表 -->
 <template>
  <div class="tansactionList">
+   <img src="https://baoimage.wallstreetcn.com/FpiwunjnvCDPKJdT-UPe2qQfTVZX?watermark/3/image/aHR0cDovL2ltYWdlLmJhby53YWxsc3RyZWV0Y24uY29tL3dhdGVyX21hcmtfdjUucG5n/dissolve/100/gravity/Center" alt="">
      <MsgListItem v-for="item in msgArr" :key="item.Id" :msg = "item"></MsgListItem>
  </div>
 </template>
