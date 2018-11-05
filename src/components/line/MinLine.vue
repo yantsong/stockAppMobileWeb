@@ -44,14 +44,14 @@ export default {
 
   mounted() {
     myChart = echarts.init(document.getElementById('eline'))
-    console.log(myChart);
+    console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
     this.getData().then(
       // res => this.empdata(res)
     )
   },
   computed: {
     pointerArr() {
-      console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'))
+      console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
       return this.trancArr.map(
         i => format(i.CreatedAt, 'YYYYMMDDHHMM')
       )
