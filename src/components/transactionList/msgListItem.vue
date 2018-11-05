@@ -2,7 +2,7 @@
 <template>
  <div class="msg-list-item">
     <div class="msg-list-item-time">
-        <span class="msg-list-item-time-dot">
+        <span class="msg-list-item-time-dot" :class="colorName(rate)">
             <i></i>
             <em></em>
             <b></b>
@@ -15,7 +15,7 @@
         {{msg.Title}}
     </div>
     <div class="msg-list-item-summary" v-if="msg.Summary" :ref="msg.Id" v-cut="{class:'line-clamp'}">{{msg.Summary}}</div>
-    <div class="msg-list-item-imgwrap">
+    <div class="msg-list-item-imgwrap" v-if="msg.Image">
       <img :src="msg.Image" />
     </div>
     <StockTrend v-if="stocks" :stocks = "stocks" :stocksPool = "stocksPool" :fields="fields" class="msg-list-item-stock"></StockTrend>
@@ -41,6 +41,17 @@ $green:#4da370;
             height: 16px;
             line-height: 16px;
             vertical-align: middle;;
+            &.color-green{
+              i{
+                border-color: $green;
+            }
+            em{
+                background-color: $green;
+            }
+            b{
+                background-color: $green;
+            }
+            }
             i{
                 width: 16px;
                 height: 16px;
@@ -184,7 +195,7 @@ export default {
       )
     },
     colorName (rate) {
-      if (rate > 0) {
+      if (rate >= 0) {
         return 'color-red'
       } else {
         return 'color-green'
@@ -264,7 +275,7 @@ export default {
     // 超出省略号指令 @Parmas :Object {class:[String],height:[Number]}
     cut: {
       inserted: function (el, binding) {
-        let height = binding.value.height || 120
+        let height = binding.value.height || 0
         let cutClass = binding.value.class
         let cut = el.offsetHeight > height
         cut && el.classList.add(cutClass)

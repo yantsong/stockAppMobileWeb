@@ -8,13 +8,17 @@
    <MinLine v-if="active == 0"></MinLine>
    <KLineDay v-if="isklineactive()" :klineapi = "klineapi" :type ="keyword"></KLineDay>
    <div class="transaction-bgline"></div>
-    <ul class="transaction-option-tab">
+    <ul class="transaction-option-tab" ref="optionTab">
+      <li :class="optionActive === index ? 'active' : ''"  @click="optionActive = index" v-for="(item,index) in  optionTabList" :key="index">{{item}}</li>
+    </ul>
+    <ul class="transaction-option-tab" v-if="fixed" :class="fixed ? 'fixed' :''">
       <li :class="optionActive === index ? 'active' : ''"  @click="optionActive = index" v-for="(item,index) in  optionTabList" :key="index">{{item}}</li>
     </ul>
     <keep-alive>
     <TransactionList v-if="optionActive == 0"></TransactionList>
     <StockTransaction v-if="optionActive == 1"></StockTransaction>
     </keep-alive>
+
     <!-- <photoswiper></photoswiper> -->
  </div>
 </template>
@@ -46,6 +50,7 @@
     align-items: center;
     justify-content: flex-start;
     box-shadow: 1px 0 1px #f1f1f1;
+    background-color: #fff;
     // padding: 10px 0;
     li{
       margin: 0 38px;
@@ -57,6 +62,11 @@
         color:#333333;
         border-bottom-color: #e6394d;
       }
+    }
+    &.fixed{
+      width: 100%;
+      position: fixed;
+      top: 0;
     }
   }
 }
@@ -73,6 +83,7 @@ import {getSSToday, getSSKlineDay, getSSKlineWeek, getSSKlineMonth, getSSKline5M
 export default {
   data () {
     return {
+      fixed: false,
       tabList: [
         {name: '分时', keyword: 'min'},
         // {name: '五日', keyword: '5day'},
@@ -112,7 +123,12 @@ export default {
     )
   },
 
-  mounted() {},
+  mounted() {
+    window.addEventListener('scroll', this.onScroll)
+  },
+  destroyed() {
+    window.removeEventListener('scroll', this.onScroll)
+  },
 
   methods: {
     switchTab(keyword, index) {
@@ -124,6 +140,9 @@ export default {
     },
     isklineactive() {
       return this.klinemap.hasOwnProperty(this.keyword)
+    },
+    onScroll() {
+      this.fixed = (document.body.scrollTop || document.documentElement.scrollTop) > this.$refs.optionTab.offsetTop
     }
   },
 

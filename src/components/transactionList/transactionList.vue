@@ -2,6 +2,9 @@
 <template>
  <div class="tansactionList">
      <MsgListItem v-for="item in msgArr" :key="item.Id" :msg = "item"></MsgListItem>
+      <div class="transactionList-loading" v-if="loading">
+      正在加载...
+    </div>
  </div>
 </template>
 

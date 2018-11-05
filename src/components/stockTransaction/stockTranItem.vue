@@ -142,9 +142,8 @@ export default {
 
   computed: {
     createdTime() {
+      // 时间处理 暂用
       let time = this.stocks[6]
-      console.log(this.stocks[6]);
-
       return time.slice(10, 16)
     },
     rate() {
