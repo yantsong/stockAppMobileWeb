@@ -14,6 +14,7 @@ require('echarts/lib/chart/bar')
 require('echarts/lib/component/markLine')
 let myChart
 const seriesLineColor = ['#3165c3', '#a5a5a5', '#38b6fc'];
+const pointerColor = ['#f2564e']
 
 export default {
   data () {
@@ -44,14 +45,13 @@ export default {
 
   mounted() {
     myChart = echarts.init(document.getElementById('eline'))
-    console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
     this.getData().then(
       // res => this.empdata(res)
     )
   },
   computed: {
     pointerArr() {
-      console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
+      // console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
       return this.trancArr.map(
         i => format(i.CreatedAt, 'YYYYMMDDHHMM')
       )
@@ -66,6 +66,10 @@ export default {
     // eslint-disable-next-line
     dataLineY: function(){
       this.empdata()
+    },
+    pointerArr() {
+      console.log(this.trancArr, 'qqq');
+      // console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
     }
   },
 
@@ -207,6 +211,54 @@ export default {
               yAxis: pre_px
             }],
             symbol: 'none'
+          },
+          markPoint: {
+            symbol: 'pin',
+            symbolSize: 1,
+            label: {
+              formatter: function(p) {
+                // return `{a|${p.value}}\n{b| }`
+                return `{a|大盘异动}\n{b| }`
+              },
+              textBorderWidth: 0,
+              rich: {
+                a: {
+                  borderWidth: 1,
+                  borderColor: pointerColor[0],
+                  backgroundColor: 'transparent',
+                  color: '#000',
+                  padding: [2, 5],
+                  height: 10,
+                  textBorderColor: 'transparent'
+                },
+                b: {
+                  height: 50,
+                  width: 0,
+                  backgroundColor: 'transparent',
+                  borderWidth: 1,
+                  borderColor: pointerColor[0]
+                }
+              }
+
+            },
+            data: [
+              {
+                name: 'XX标点',
+                coord: [dataLineX[10].value, dataLineY[10].value],
+                value: dataLineY[10].value,
+                itemStyle: {
+                  normal: {color: 'rgb(41,60,85)'}
+                },
+                label: {
+                  position: [0, -62],
+                  rich: {
+                    a: {
+                      height: 15
+                    }
+                  }
+                }
+              }
+            ]
           },
           symbol: 'none',
           // symbolSize: 2,
