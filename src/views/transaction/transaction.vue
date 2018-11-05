@@ -1,11 +1,11 @@
 <!-- 大盘异动 -->
 <template>
  <div class="transaction">
-   <SSInfoTitle :ssdata = 'sstoday' v-if="sstoday.length"></SSInfoTitle>
+   <SSInfoTitle :ssdata = 'sstoday' v-if="sstoday.length" ></SSInfoTitle>
    <ul class="transaction-chart-tab">
      <li :class="active === index ? 'active' : ''" @click="switchTab(item.keyword,index)" v-for="(item,index) in  tabList" :key="index">{{item.name}}</li>
    </ul>
-   <MinLine v-if="active == 0"></MinLine>
+   <MinLine v-if="active == 0" :trancArr = "trancArr"></MinLine>
    <KLineDay v-if="isklineactive()" :klineapi = "klineapi" :type ="keyword"></KLineDay>
    <div class="transaction-bgline"></div>
     <ul class="transaction-option-tab" ref="optionTab">
@@ -15,7 +15,7 @@
       <li :class="optionActive === index ? 'active' : ''"  @click="optionActive = index" v-for="(item,index) in  optionTabList" :key="index">{{item}}</li>
     </ul>
     <keep-alive>
-    <TransactionList v-if="optionActive == 0"></TransactionList>
+    <TransactionList v-if="optionActive == 0" @trancInfo = "trancArrHandle"></TransactionList>
     <StockTransaction v-if="optionActive == 1"></StockTransaction>
     </keep-alive>
 
@@ -111,7 +111,8 @@ export default {
       optionActive: 0,
       keyword: '',
       klineapi: '',
-      sstoday: []
+      sstoday: [],
+      trancArr: []
     };
   },
 
@@ -122,6 +123,11 @@ export default {
       }
     )
   },
+  computed: {
+    data: function() {
+      return 0
+    }
+  },
 
   mounted() {
     window.addEventListener('scroll', this.onScroll)
@@ -131,7 +137,12 @@ export default {
   },
 
   methods: {
+    trancArrHandle(value) {
+      console.log(value);
+      this.trancArr = value
+    },
     switchTab(keyword, index) {
+      console.log(this.$refs.transaction.msgArr, '1')
       this.active = index
       this.keyword = keyword
       if (this.isklineactive()) {
@@ -145,9 +156,6 @@ export default {
       this.fixed = (document.body.scrollTop || document.documentElement.scrollTop) > this.$refs.optionTab.offsetTop
     }
   },
-
-  computed: {},
-
   components: {MinLine, KLineDay, SSInfoTitle, TransactionList, StockTransaction}
 
 }

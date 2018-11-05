@@ -7,6 +7,7 @@
 
 <script>
 import {getSSMin} from '@/service/stocksApi'
+import format from "date-fns/format";
 let echarts = require('echarts/lib/echarts')
 require('echarts/lib/chart/line')
 require('echarts/lib/chart/bar')
@@ -30,6 +31,12 @@ export default {
       min: ''
     }
   },
+  props: {
+    'trancArr': {
+      type: Array,
+      default: () => []
+    }
+  },
 
   created() {
     this.getData()
@@ -41,6 +48,14 @@ export default {
     this.getData().then(
       // res => this.empdata(res)
     )
+  },
+  computed: {
+    pointerArr() {
+      console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'))
+      return this.trancArr.map(
+        i => format(i.CreatedAt, 'YYYYMMDDHHMM')
+      )
+    }
   },
   watch: {
     minData: function() {
@@ -75,8 +90,7 @@ export default {
       min = sortarr[0][1]
       max = sortarr[sortarr.length - 1][1]
 
-      difference = Math.max(max - this.pre_px, this.pre_px - min
-      )
+      difference = Math.max(max - this.pre_px, this.pre_px - min)
       if (difference >= this.difference) {
         this.max = (this.pre_px + difference).toFixed(2)
         this.min = (this.pre_px - difference).toFixed(2)
@@ -212,7 +226,7 @@ export default {
         color: ['red', 'green'],
         tooltip: {
           show: true,
-          trigger: 'none',
+          trigger: 'axis',
           axisPointer: {
             type: 'line'
           },
@@ -403,9 +417,44 @@ export default {
       };
       myChart.setOption(tchartOptions)
     }
-  },
+    //  markPoint: {
+    //             symbol:'roundRect',
+    //             symbolSize:1,
+    //             label: {
+    //                  formatter: [
+    //                     '{a|这段文}',
+    //                     '{b|2}'
+    //                 ].join('\n'),
+    //                 shadowColor:'#000',
+    //                 position:['50%','-100%'],
+    //                 // shadowBlur:10,
+    //                 // shadowOffsetX:1,
+    //                 // shadowOffsetY:10,
+    //                 textBorderWidth:0,
+    //                 rich:{
+    //                     a:{
+    //                 borderWidth:1,
+    //                 // shadowColor:'#000',
+    //                 // shadowOffsetX:1,
+    //                 // shadowBlur:0,
+    //                 borderColor:'#000',
+    //                 backgroundColor:'transparent',
+    //                         color:'#000',
+    //                 padding: [2,5],
+    //                         // shadowColor:'#fff',
+    //                         // borderColor: '#000',
+    //                         textBorderColor:'transparent'
 
-  computed: {
+    //                     },
+    //                     b:{
+    //                         height:50,
+    //                         width:1,
+    //                         backgroundColor:'#000',
+
+    //                     }
+    //                 }
+
+    //             },
   },
 
   components: {}

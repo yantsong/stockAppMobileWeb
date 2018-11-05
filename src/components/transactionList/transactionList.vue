@@ -57,6 +57,7 @@ export default {
     },
     // 获取数据
     getlist() {
+      if (this.loading) return
       this.loading = true
       let parmas = {
         tailMark: this.tailMark,
@@ -108,7 +109,15 @@ export default {
     }
   },
 
-  computed: {},
+  watch: {
+    msgArr() {
+      let trancArr = this.msgArr.filter(
+        i => i['BkjInfoArr'].length
+      )
+      console.log(trancArr);
+      this.$emit('trancInfo', trancArr)
+    }
+  },
 
   components: {MsgListItem}
 

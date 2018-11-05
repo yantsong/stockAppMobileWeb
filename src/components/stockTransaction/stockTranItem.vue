@@ -147,7 +147,7 @@ export default {
       return time.slice(10, 16)
     },
     rate() {
-      return this.stocks[3].pcp
+      return this.stocks[3].pcp && this.stocks[3].pcp.toFixed(2)
     },
     status() {
       return this.stocks[2]
