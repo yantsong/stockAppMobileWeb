@@ -52,8 +52,12 @@ export default {
   computed: {
     pointerArr() {
       // console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
-      return this.trancArr.map(
-        i => format(i.CreatedAt, 'YYYYMMDDHHMM')
+      return this.trancArr.filter(
+        i => {
+          console.log(format(i.CreatedAt, 'DD') === format(new Date(), 'DD'));
+
+          return format(i.CreatedAt, 'YYYYMMDDHHMM')
+        }
       )
     }
   },
@@ -165,6 +169,7 @@ export default {
               color: seriesLineColor[0]
             }
           },
+          smooth: true,
           axisLabel: {
             inside: true,
             color: '#8c8f8c',
@@ -213,13 +218,14 @@ export default {
             symbol: 'none'
           },
           markPoint: {
-            symbol: 'pin',
-            symbolSize: 1,
+            symbol: 'circle',
+            symbolSize: 7,
             label: {
               formatter: function(p) {
                 // return `{a|${p.value}}\n{b| }`
-                return `{a|大盘异动}\n{b| }`
+                return `{a|大盘异动}\n{b| }\n{c| }`
               },
+              fontSize: 12,
               textBorderWidth: 0,
               rich: {
                 a: {
@@ -227,16 +233,14 @@ export default {
                   borderColor: pointerColor[0],
                   backgroundColor: 'transparent',
                   color: '#000',
-                  padding: [2, 5],
-                  height: 10,
+                  padding: [3, 7],
                   textBorderColor: 'transparent'
                 },
                 b: {
-                  height: 50,
+                  align: 'cener',
                   width: 0,
                   backgroundColor: 'transparent',
-                  borderWidth: 1,
-                  borderColor: pointerColor[0]
+                  borderWidth: 1
                 }
               }
 
@@ -247,13 +251,17 @@ export default {
                 coord: [dataLineX[10].value, dataLineY[10].value],
                 value: dataLineY[10].value,
                 itemStyle: {
-                  normal: {color: 'rgb(41,60,85)'}
+                  normal: {color: '#fff', borderColor: pointerColor[0]}
                 },
                 label: {
-                  position: [0, -62],
+                  position: [4.5, -70],
                   rich: {
                     a: {
                       height: 15
+                    },
+                    b: {
+                      height: 50,
+                      borderColor: pointerColor[0]
                     }
                   }
                 }
