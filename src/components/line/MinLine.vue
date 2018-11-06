@@ -1,7 +1,7 @@
 <!-- 大盘异动 -->
 <template>
  <div>
-     <div id="eline"></div>
+     <div id="eline" ref="eline"></div>
  </div>
 </template>
 
@@ -26,10 +26,15 @@ export default {
       dataBarX: [],
       dataBarY: [],
       datalinePre: [],
+      dataPreValueX: [],
+      pointerIndexArr: [],
+      height: 50,
+      tagHeight: 15,
       difference: 0,
       rate: '',
       max: '',
-      min: ''
+      min: '',
+      heightFlag: 0
     }
   },
   props: {
@@ -45,20 +50,37 @@ export default {
 
   mounted() {
     myChart = echarts.init(document.getElementById('eline'))
+    let el = document.querySelector('#eline')
+    console.log(el.offsetHeight);
+
     this.getData().then(
       // res => this.empdata(res)
     )
   },
   computed: {
     pointerArr() {
-      // console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
-      return this.trancArr.filter(
-        i => {
-          console.log(format(i.CreatedAt, 'DD') === format(new Date(), 'DD'));
-
-          return format(i.CreatedAt, 'YYYYMMDDHHMM')
-        }
+      // 只取今日
+      let arr = this.trancArr.filter(
+        i => format(i.CreatedAt, 'DD') === format(new Date(), 'DD')
       )
+      // index计算以及tagname获取
+      return arr.map(i => {
+        let index = this.dataPreValueX.indexOf(format(i.CreatedAt, 'HHmm'))
+        let obj = {}
+        obj['pIndex'] = index
+        obj['am'] = format(i.CreatedAt, 'HHmm') < '1131'
+        obj['tagName'] = i.BkjInfoArr[0].Name
+        return obj
+      })
+    },
+    dynamicHeight() {
+      // 4个
+      let baseHeight = 10
+      let count = 4
+      let tagHeight = this.tagHeight
+      let flag = this.heightFlag
+      console.log((flag % count) * tagHeight + baseHeight, (flag % count))
+      return (flag % count) * tagHeight + baseHeight
     }
   },
   watch: {
@@ -71,9 +93,11 @@ export default {
     dataLineY: function(){
       this.empdata()
     },
-    pointerArr() {
-      console.log(this.trancArr, 'qqq');
-      // console.log(format(this.trancArr[0].CreatedAt, 'YYYYMMDDHHMM'), format(new Date(this.trancArr[0].CreatedAt), 'YYYYMMDDHHMM'), 'aaa')
+    pointerArr(value) {
+      // 计算
+      console.log(value);
+      // 处理ponit data
+      this.empdata()
     }
   },
 
@@ -114,6 +138,7 @@ export default {
       let dataLineY = []
       let dataBarY = []
       let datalinePre = []
+      let dataPreValueX = []
       minData.forEach(
         (item, index) => {
           // let objx = item[0].toString().slice(-4)
@@ -137,6 +162,7 @@ export default {
               color: item[1] > colorNumber ? '#f3564d' : '#1cbf7b'
             }
           }
+          dataPreValueX.push(objx.value)
           dataLineX.push(objx)
           dataLineY.push(objy)
           dataBarY.push(objbar)
@@ -145,13 +171,60 @@ export default {
           colorNumber = item[1]
         }
       )
+      this.dataPreValueX = dataPreValueX
       this.dataLineX = dataLineX
       this.dataLineY = dataLineY
       this.dataBarY = dataBarY
       this.datalinePre = datalinePre
     },
     empdata() {
-      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px} = this
+      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight} = this
+      pointerArr = pointerArr.filter(i => i.pIndex !== -1)
+      // 半个分时图大小
+      let chartHalfHeight = document.querySelector('#eline').offsetHeight * 2 / 6
+      // 计算距中线距离
+      function cptHeight (item) {
+        let distanceRate = (pre_px - dataLineY[item.pIndex].value) / (pre_px - min)
+        return Math.abs(chartHalfHeight * distanceRate)
+      }
+
+      // console.log(el);
+      // let
+      console.log(chartHalfHeight, pre_px);
+
+      let pointerData = pointerArr.map(
+        (item, index) => {
+          this.heightFlag = index
+          cptHeight(item)
+          let positionY = this.dynamicHeight + tagHeight + cptHeight(item)
+          if (dataLineY[item.pIndex].value < pre_px) positionY = -positionY
+          let obj = {
+            coord: [dataLineX[item.pIndex].value, dataLineY[item.pIndex].value],
+            value: dataLineY[item.pIndex].value,
+            itemStyle: {
+              normal: {color: '#fff', borderColor: pointerColor[0]}
+            },
+            label: {
+              formatter: function(p) {
+                // return `{a|${p.value}}\n{b| }`
+                return `{a|${item.tagName}}\n{b| }\n{c| }`
+              },
+              position: [4.5, positionY],
+              rich: {
+                a: {
+                  height: 10
+                },
+                b: {
+                  height: (this.dynamicHeight + cptHeight(item)),
+                  borderColor: pointerColor[0]
+                }
+              }
+            }
+          }
+
+          return obj
+        }
+      )
 
       let series = [
         // y轴1 分时线
@@ -221,10 +294,10 @@ export default {
             symbol: 'circle',
             symbolSize: 7,
             label: {
-              formatter: function(p) {
-                // return `{a|${p.value}}\n{b| }`
-                return `{a|大盘异动}\n{b| }\n{c| }`
-              },
+              // formatter: function(p) {
+              //   // return `{a|${p.value}}\n{b| }`
+              //   return `{a|大盘异动}\n{b| }\n{c| }`
+              // },
               fontSize: 12,
               textBorderWidth: 0,
               rich: {
@@ -245,28 +318,7 @@ export default {
               }
 
             },
-            data: [
-              {
-                name: 'XX标点',
-                coord: [dataLineX[10].value, dataLineY[10].value],
-                value: dataLineY[10].value,
-                itemStyle: {
-                  normal: {color: '#fff', borderColor: pointerColor[0]}
-                },
-                label: {
-                  position: [4.5, -70],
-                  rich: {
-                    a: {
-                      height: 15
-                    },
-                    b: {
-                      height: 50,
-                      borderColor: pointerColor[0]
-                    }
-                  }
-                }
-              }
-            ]
+            data: pointerData
           },
           symbol: 'none',
           // symbolSize: 2,
