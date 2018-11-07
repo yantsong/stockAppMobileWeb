@@ -19,7 +19,7 @@ const pointerColor = ['#f2564e']
 export default {
   data () {
     return {
-      minData: '',
+      minData: [],
       pre_px: 0,
       dataLineX: [],
       dataLineY: [],
@@ -34,7 +34,9 @@ export default {
       rate: '',
       max: '',
       min: '',
-      heightFlag: 0
+      heightFlag: 0,
+      relativeHeight: 0,
+      objMap: {}
     }
   },
   props: {
@@ -60,27 +62,22 @@ export default {
   computed: {
     pointerArr() {
       // 只取今日
+      let DD = this.minData.length && this.minData[0][0].toString().slice(6, 8)
+      // console.log(dd.toString().slice(6, 8), 'mindata');
+      // let DD = format(this.minData[0][0].CreatedAt, 'DD')
+      console.log('DD', DD);
       let arr = this.trancArr.filter(
-        i => format(i.CreatedAt, 'DD') === format(new Date(), 'DD')
+        i => format(i.CreatedAt, 'DD') === DD
       )
       // index计算以及tagname获取
       return arr.map(i => {
         let index = this.dataPreValueX.indexOf(format(i.CreatedAt, 'HHmm'))
         let obj = {}
         obj['pIndex'] = index
-        obj['am'] = format(i.CreatedAt, 'HHmm') < '1131'
+        obj['left'] = index / this.dataPreValueX.length < 0.5
         obj['tagName'] = i.BkjInfoArr[0].Name
         return obj
       })
-    },
-    dynamicHeight() {
-      // 4个
-      let baseHeight = 10
-      let count = 4
-      let tagHeight = this.tagHeight
-      let flag = this.heightFlag
-      console.log((flag % count) * tagHeight + baseHeight, (flag % count))
-      return (flag % count) * tagHeight + baseHeight
     }
   },
   watch: {
@@ -102,6 +99,7 @@ export default {
   },
 
   methods: {
+
     getData() {
       return getSSMin().then(
         res => {
@@ -178,26 +176,97 @@ export default {
       this.datalinePre = datalinePre
     },
     empdata() {
-      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight} = this
-      pointerArr = pointerArr.filter(i => i.pIndex !== -1)
+      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight, objMap} = this
+      // let flagPaddingHeight = 3
+      let flagPaddingWidth = 7
+      let symbolSize = 7
+      let flagFontSize = 12
       // 半个分时图大小
       let chartHalfHeight = document.querySelector('#eline').offsetHeight * 2 / 6
-      // 计算距中线距离
-      function cptHeight (item) {
-        let distanceRate = (pre_px - dataLineY[item.pIndex].value) / (pre_px - min)
-        return Math.abs(chartHalfHeight * distanceRate)
+      // tag Width
+      function tagWidth(item) {
+      // 匹配英文和字符
+        let count = item.match(/\w|&/g)
+        let length = item.length
+        // 计算长度
+        if (count) {
+          return (length - count.length) * flagFontSize + count.length * (flagFontSize - 4) + flagPaddingWidth + 2 * 1
+        } else {
+          return length * flagFontSize + flagPaddingWidth + 2 * 1
+        }
       }
+      function dynamicHeight(item) {
+        let x = cptHeight(item)
+        let y
+        let obj = objMap
+        console.log(x, 'x');
+        for (let index = 0; index < parseInt(chartHalfHeight * 2 / tagHeight); index++) {
+          if (!obj[index]) continue;
+          console.log(obj[index]);
+          if (x < chartHalfHeight) {
+            if (obj[index] > x) {
+              y = obj[index] - x
+              delete obj[index]
+              return y
+            }
+          } else {
+            if (obj[index] + tagHeight < x) {
+              y = x - obj[index]
+              delete obj[index]
+              console.log(y, 'yyy');
+              return y
+            }
+          }
+        }
+      }
+      // 一个map
+      function makeObj() {
+        let num = parseInt(chartHalfHeight * 2 / tagHeight)
+        let o = {}
+        for (let index = 0; index < num; index++) {
+          o[index] = tagHeight * index
+        }
+        return o
+      }
+      objMap = makeObj()
 
-      // console.log(el);
-      // let
-      console.log(chartHalfHeight, pre_px);
-
+      pointerArr = pointerArr.filter(i => i.pIndex !== -1)
+      // 计算距底边
+      function cptHeight (item) {
+        let distanceRate = (dataLineY[item.pIndex].value - min) / (pre_px - min)
+        return chartHalfHeight * distanceRate
+      }
       let pointerData = pointerArr.map(
         (item, index) => {
+          // positonX X轴偏移
+          // flagPosition 旗子方向 左右
+          let positionX, positionY, flagPosition
+          // flagRate 上方还是下方
+          this.relativeHeight = cptHeight(item)
           this.heightFlag = index
-          cptHeight(item)
-          let positionY = this.dynamicHeight + tagHeight + cptHeight(item)
-          if (dataLineY[item.pIndex].value < pre_px) positionY = -positionY
+          // tagWidth(item.tagName)
+          let flagRate = dataLineY[item.pIndex].value <= pre_px
+          positionY = dynamicHeight(item) + tagHeight + symbolSize + 2
+
+          // item[left] 左半边还是右半边
+          if (!item['left']) { // 右边
+            flagPosition = 'right'
+            positionX = tagWidth(item.tagName) * -1
+            if (flagRate) { // 右下
+              positionY = -positionY
+            } else { // 右上
+              positionY = symbolSize
+            }
+          } else { // 左边
+            flagPosition = 'left'
+            if (flagRate) { // 左下
+              positionX = '50%'
+              positionY = -positionY
+            } else { // 左上
+              positionX = symbolSize / 2
+              positionY = symbolSize
+            }
+          }
           let obj = {
             coord: [dataLineX[item.pIndex].value, dataLineY[item.pIndex].value],
             value: dataLineY[item.pIndex].value,
@@ -206,16 +275,16 @@ export default {
             },
             label: {
               formatter: function(p) {
-                // return `{a|${p.value}}\n{b| }`
-                return `{a|${item.tagName}}\n{b| }\n{c| }`
+                return flagRate ? `{a|${item.tagName}}\n{b| }` : `{b| }\n{a|${item.tagName}}`
               },
-              position: [4.5, positionY],
+              position: [positionX, positionY],
               rich: {
                 a: {
                   height: 10
                 },
                 b: {
-                  height: (this.dynamicHeight + cptHeight(item)),
+                  align: flagPosition,
+                  height: positionY,
                   borderColor: pointerColor[0]
                 }
               }
@@ -292,12 +361,8 @@ export default {
           },
           markPoint: {
             symbol: 'circle',
-            symbolSize: 7,
+            symbolSize: symbolSize,
             label: {
-              // formatter: function(p) {
-              //   // return `{a|${p.value}}\n{b| }`
-              //   return `{a|大盘异动}\n{b| }\n{c| }`
-              // },
               fontSize: 12,
               textBorderWidth: 0,
               rich: {
@@ -310,7 +375,7 @@ export default {
                   textBorderColor: 'transparent'
                 },
                 b: {
-                  align: 'cener',
+                  align: 'right',
                   width: 0,
                   backgroundColor: 'transparent',
                   borderWidth: 1
