@@ -176,11 +176,12 @@ export default {
       this.datalinePre = datalinePre
     },
     empdata() {
-      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight, objMap} = this
+      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight} = this
       // let flagPaddingHeight = 3
       let flagPaddingWidth = 7
       let symbolSize = 7
       let flagFontSize = 12
+      let objMap
       // 半个分时图大小
       let chartHalfHeight = document.querySelector('#eline').offsetHeight * 2 / 6
       // tag Width
@@ -198,22 +199,24 @@ export default {
       function dynamicHeight(item) {
         let x = cptHeight(item)
         let y
-        let obj = objMap
-        console.log(x, 'x');
-        for (let index = 0; index < parseInt(chartHalfHeight * 2 / tagHeight); index++) {
-          if (!obj[index]) continue;
-          console.log(obj[index]);
+        let i = 1
+        let length = parseInt((chartHalfHeight * 2) / tagHeight)
+        console.log(objMap);
+        for (let index = 2; index < length - 1; index++) {
+          i = i * -1
+          let active = i > 0 ? length - index : index
+          if (!objMap[active]) continue;
+          console.log(objMap[active], active, 'active');
           if (x < chartHalfHeight) {
-            if (obj[index] > x) {
-              y = obj[index] - x
-              delete obj[index]
+            if (objMap[active] > x) {
+              y = objMap[active] - x
+              objMap[active] = null
               return y
             }
           } else {
-            if (obj[index] + tagHeight < x) {
-              y = x - obj[index]
-              delete obj[index]
-              console.log(y, 'yyy');
+            if (objMap[active] + tagHeight < x) {
+              y = x - objMap[active]
+              objMap[active] = null
               return y
             }
           }
@@ -226,9 +229,10 @@ export default {
         for (let index = 0; index < num; index++) {
           o[index] = tagHeight * index
         }
+        objMap = o
         return o
       }
-      objMap = makeObj()
+      makeObj()
 
       pointerArr = pointerArr.filter(i => i.pIndex !== -1)
       // 计算距底边
@@ -244,9 +248,11 @@ export default {
           // flagRate 上方还是下方
           this.relativeHeight = cptHeight(item)
           this.heightFlag = index
+          if (index % 6 === 0) objMap = makeObj()
           // tagWidth(item.tagName)
           let flagRate = dataLineY[item.pIndex].value <= pre_px
-          positionY = dynamicHeight(item) + tagHeight + symbolSize + 2
+          let height = dynamicHeight(item)
+          positionY = height + tagHeight
 
           // item[left] 左半边还是右半边
           if (!item['left']) { // 右边
@@ -284,7 +290,7 @@ export default {
                 },
                 b: {
                   align: flagPosition,
-                  height: positionY,
+                  height: height,
                   borderColor: pointerColor[0]
                 }
               }
