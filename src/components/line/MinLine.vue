@@ -28,7 +28,6 @@ export default {
       datalinePre: [],
       dataPreValueX: [],
       pointerIndexArr: [],
-      height: 50,
       tagHeight: 15,
       difference: 0,
       rate: '',
@@ -36,7 +35,8 @@ export default {
       min: '',
       heightFlag: 0,
       relativeHeight: 0,
-      objMap: {}
+      objMap: {},
+      timer: null
     }
   },
   props: {
@@ -52,20 +52,12 @@ export default {
 
   mounted() {
     myChart = echarts.init(document.getElementById('eline'))
-    let el = document.querySelector('#eline')
-    console.log(el.offsetHeight);
-
-    this.getData().then(
-      // res => this.empdata(res)
-    )
+    this._autoRefresh(30)
   },
   computed: {
     pointerArr() {
       // 只取今日
       let DD = this.minData.length && this.minData[0][0].toString().slice(6, 8)
-      // console.log(dd.toString().slice(6, 8), 'mindata');
-      // let DD = format(this.minData[0][0].CreatedAt, 'DD')
-      console.log('DD', DD);
       let arr = this.trancArr.filter(
         i => format(i.CreatedAt, 'DD') === DD
       )
@@ -84,22 +76,23 @@ export default {
     minData: function() {
       this.computeMaxMin()
       this.computedataLineXY()
-      // this.
     },
     // eslint-disable-next-line
     dataLineY: function(){
       this.empdata()
     },
     pointerArr(value) {
-      // 计算
-      console.log(value);
-      // 处理ponit data
       this.empdata()
     }
   },
 
   methods: {
-
+    _autoRefresh(seconds) {
+      if (this.timer) return
+      this.timer = setInterval(
+        this.getData, 1000 * seconds
+      )
+    },
     getData() {
       return getSSMin().then(
         res => {

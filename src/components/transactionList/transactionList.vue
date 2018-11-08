@@ -35,7 +35,7 @@ export default {
   created() {
     this.getlist()
     // 定时任务 S
-    this.setTaskInterval(30)
+    this._setTaskInterval(30)
   },
 
   mounted() {
@@ -49,7 +49,7 @@ export default {
 
   methods: {
     // 定时任务
-    setTaskInterval(n) {
+    _setTaskInterval(n) {
       clearInterval(this.timer)
       this.timer = setInterval(
         this.refreshData, n * 1000

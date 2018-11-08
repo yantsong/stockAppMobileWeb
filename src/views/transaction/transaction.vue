@@ -112,7 +112,8 @@ export default {
       keyword: '',
       klineapi: '',
       sstoday: [],
-      trancArr: []
+      trancArr: [],
+      timer: null
     };
   },
 
@@ -131,18 +132,31 @@ export default {
 
   mounted() {
     window.addEventListener('scroll', this.onScroll)
+    this._autoRefresh(30)
   },
   destroyed() {
     window.removeEventListener('scroll', this.onScroll)
   },
 
   methods: {
+    _autoRefresh(seconds) {
+      if (this.timer) return
+      setInterval(
+        this._getInfoData, 1000 * seconds
+      )
+    },
+    _getInfoData() {
+      getSSToday().then(
+        res => {
+          this.sstoday = res.data.snapshot['000001.SS'] || []
+        }
+      )
+    },
     trancArrHandle(value) {
       console.log(value);
       this.trancArr = value
     },
     switchTab(keyword, index) {
-      console.log(this.$refs.transaction.msgArr, '1')
       this.active = index
       this.keyword = keyword
       if (this.isklineactive()) {
