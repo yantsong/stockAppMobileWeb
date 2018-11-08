@@ -1,7 +1,7 @@
 <!-- 大盘异动列表 -->
 <template>
  <div class="tansactionList">
-     <MsgListItem :key="topMsg.Id + 'song'" :msg = "topMsg" v-if="topMsg" :topTag = "topTag"></MsgListItem>
+     <MsgListItem :key="topMsg.Id + 'song'" :msg = "topMsg" v-if="topMsg" :topTag = "topTagId"></MsgListItem>
      <MsgListItem v-for="item in msgArr" :key="item.Id" :msg = "item"></MsgListItem>
       <div class="transactionList-loading" v-if="loading">
       正在加载...
@@ -33,7 +33,7 @@ export default {
     };
   },
   props: {
-    topTag: {
+    topTagId: {
       type: String,
       default: ''
     }
@@ -56,11 +56,12 @@ export default {
   },
   computed: {
     topMsg() {
-      if (!this.topTag) return null
+      // 通过传进来的Id筛选置顶的数据
+      if (!this.topTagId) return null
       let arr = this.msgArr.filter(
-        i => i.BkjInfoArr.length && i.BkjInfoArr[0].Name === this.topTag
+        i => i.BkjInfoArr.length && i.Id === this.topTagId
       )
-      return arr[arr.length - 1]
+      return arr[0]
     }
   },
   methods: {

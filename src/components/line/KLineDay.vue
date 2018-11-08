@@ -309,7 +309,7 @@ export default {
           scale: true,
           show: false,
           axisLine: { lineStyle: { color: '#8392A5' } },
-          boundaryGap: ['3%', '1%'],
+          boundaryGap: ['2%', '2%'],
           axisLabel: {
             inside: true
             // show: false
@@ -329,9 +329,9 @@ export default {
         grid: [{
           left: '0px',
           right: '2px',
-          height: '72%',
+          height: '69%',
           // width: '99%',
-          top: '0px',
+          top: '3%',
           containLabel: true
         }, {
           height: '30%',

@@ -41,7 +41,8 @@ export default {
       objMap: {},
       timer: null,
       flagActive: null,
-      flagPindex: null
+      flagPindex: null,
+      flagId: null
     }
   },
   props: {
@@ -66,12 +67,12 @@ export default {
         this.flagPositons.forEach(
           i => {
             if (i.x1 <= x && x <= i.x2 && i.y1 <= y && y < i.y2) {
-              if (this.flagActive === i.tagName && this.flagPindex === i.pIndex) {
+              if (this.flagId === i.Id) {
                 this.flagActive = null
-                this.flagPindex = null
+                this.flagId = null
               } else {
                 this.flagActive = i.tagName
-                this.flagPindex = i.pIndex
+                this.flagId = i.Id
               }
             }
           }
@@ -93,7 +94,7 @@ export default {
         obj['pIndex'] = index
         obj['left'] = index / this.dataPreValueX.length < 0.5
         obj['tagName'] = i.BkjInfoArr[0].Name
-        // obj['rate'] = i.
+        obj['Id'] = i.Id
         return obj
       })
     }
@@ -110,7 +111,7 @@ export default {
     pointerArr(value) {
       this.empdata()
     },
-    flagActive(value) {
+    flagId(value) {
       this.$emit('onTop', value)
       this.empdata()
     }
@@ -199,7 +200,7 @@ export default {
       this.datalinePre = datalinePre
     },
     empdata() {
-      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight, flagPindex, flagActive} = this
+      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight, flagId} = this
       // let flagPaddingHeight = 3
       let flagPaddingWidth = 7
       let symbolSize = 7
@@ -220,26 +221,30 @@ export default {
           return length * flagFontSize + flagPaddingWidth + 2 * 1
         }
       }
+      let iStatus = 1
+      // 计算动态高度
       function dynamicHeight(item) {
+        // 距离底边距离 即x轴位置
         let x = cptHeight(item)
         let y
-        let i = 1
-        let length = Math.floor((chartHalfHeight * 2) / tagHeight)
+        let length = Math.floor((chartHalfHeight * 2) / (tagHeight + 3))
+        iStatus = iStatus * -1
         for (let index = 2; index < length - 1; index++) {
-          i = i * -1
-          let active = i > 0 ? length - index : index
+          let active = iStatus > 0 ? length - index : index
+          // 该区间已经有值 跳过
           if (!objMap[active]) continue;
-          console.log(objMap[active], active, 'active');
-          if (x < chartHalfHeight) {
-            if (objMap[active] > x) {
+          console.log(objMap[active], active, 'active', iStatus);
+          if (x < chartHalfHeight) { // 下半区
+            if (objMap[active] - tagHeight > x) { // 下半区旗子向上 所以 objMap区间的x值必须要大于x 而且最小距离不小于tagheight
               y = objMap[active] - x
               objMap[active] = null
               return y
             }
-          } else {
-            if (objMap[active] + tagHeight < x) {
+          } else { // 上半区
+            if (objMap[active] + tagHeight < x) { // 上半区旗子向下 所以objMap 必须小于x 而且最小距离不小于tagheight
               y = x - objMap[active]
               objMap[active] = null
+              console.log('y的index', active);
               return y
             }
           }
@@ -247,6 +252,7 @@ export default {
       }
       // 一个map
       function makeObj() {
+        // 以x轴 划分区间 区间高度为 tagHeight + 3 减少误差而冲突可能性
         let num = Math.floor(chartHalfHeight * 2 / (tagHeight + 3))
         let o = {}
         for (let index = 0; index < num; index++) {
@@ -283,11 +289,11 @@ export default {
           // y基点
           let yBase = chartHalfHeight * 2 - cptHeight(item)
           // 位置对象
-          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName}
+          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName, 'Id': item.Id}
           // y轴偏移计算
           positionY = height + tagHeight
           // 检测是否是被选中
-          if (flagActive === item.tagName && flagPindex === item.pIndex) {
+          if (flagId === item.Id) {
             bgColor = red
             fontColor = '#fff'
           } else {
@@ -641,56 +647,16 @@ export default {
           {
             type: 'inside',
             y: '100%'
-            // startValue: data.time.length > 500 ?  data.time.length - 500 : 0,
-            // endValue: data.time.length
           }
         ],
         series: series
       };
       myChart.setOption(tchartOptions)
+      // 取到flag的位置数组
       this.flagPositons = myChart.getOption().series[1].markPoint.data.map(
         item => item.positions
       )
-      console.log(myChart.getOption().series[1].markPoint.data);
     }
-    //  markPoint: {
-    //             symbol:'roundRect',
-    //             symbolSize:1,
-    //             label: {
-    //                  formatter: [
-    //                     '{a|这段文}',
-    //                     '{b|2}'
-    //                 ].join('\n'),
-    //                 shadowColor:'#000',
-    //                 position:['50%','-100%'],
-    //                 // shadowBlur:10,
-    //                 // shadowOffsetX:1,
-    //                 // shadowOffsetY:10,
-    //                 textBorderWidth:0,
-    //                 rich:{
-    //                     a:{
-    //                 borderWidth:1,
-    //                 // shadowColor:'#000',
-    //                 // shadowOffsetX:1,
-    //                 // shadowBlur:0,
-    //                 borderColor:'#000',
-    //                 backgroundColor:'transparent',
-    //                         color:'#000',
-    //                 padding: [2,5],
-    //                         // shadowColor:'#fff',
-    //                         // borderColor: '#000',
-    //                         textBorderColor:'transparent'
-
-    //                     },
-    //                     b:{
-    //                         height:50,
-    //                         width:1,
-    //                         backgroundColor:'#000',
-
-    //                     }
-    //                 }
-
-    //             },
   },
 
   components: {}

@@ -15,7 +15,7 @@
       <li :class="optionActive === index ? 'active' : ''"  @click="optionActive = index" v-for="(item,index) in  optionTabList" :key="index">{{item}}</li>
     </ul>
     <keep-alive>
-    <TransactionList v-if="optionActive == 0" @trancInfo = "trancArrHandle" :topTag = "topTag"></TransactionList>
+    <TransactionList v-if="optionActive == 0" @trancInfo = "trancArrHandle" :topTagId = "topTagId"></TransactionList>
     <StockTransaction v-if="optionActive == 1"></StockTransaction>
     </keep-alive>
 
@@ -114,7 +114,7 @@ export default {
       sstoday: [],
       trancArr: [],
       timer: null,
-      topTag: ''
+      topTagId: ''
     };
   },
 
@@ -154,10 +154,9 @@ export default {
       )
     },
     _topMsg(msg) {
-      this.topTag = msg
+      this.topTagId = msg
     },
     trancArrHandle(value) {
-      console.log(value);
       this.trancArr = value
     },
     switchTab(keyword, index) {
