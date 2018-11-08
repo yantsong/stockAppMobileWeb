@@ -10,7 +10,7 @@ const RelatedFunds = () => import('@/views/relatedFunds/relatedFunds')
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: '/h5/jinrijihui',
   routes: [
@@ -27,7 +27,8 @@ export default new Router({
     {
       path: '/transaction',
       name: 'Transaction',
-      component: Transaction
+      component: Transaction,
+      meta: '异动提醒'
     },
     {
       path: '/relatedFunds/:id',
@@ -46,3 +47,5 @@ export default new Router({
     }
   ]
 })
+// router.
+export default router

@@ -5,7 +5,7 @@
    <ul class="transaction-chart-tab">
      <li :class="active === index ? 'active' : ''" @click="switchTab(item.keyword,index)" v-for="(item,index) in  tabList" :key="index">{{item.name}}</li>
    </ul>
-   <MinLine v-if="active == 0" :trancArr = "trancArr"></MinLine>
+   <MinLine v-if="active == 0" :trancArr = "trancArr" @onTop="_topMsg"></MinLine>
    <KLineDay v-if="isklineactive()" :klineapi = "klineapi" :type ="keyword"></KLineDay>
    <div class="transaction-bgline"></div>
     <ul class="transaction-option-tab" ref="optionTab">
@@ -15,7 +15,7 @@
       <li :class="optionActive === index ? 'active' : ''"  @click="optionActive = index" v-for="(item,index) in  optionTabList" :key="index">{{item}}</li>
     </ul>
     <keep-alive>
-    <TransactionList v-if="optionActive == 0" @trancInfo = "trancArrHandle"></TransactionList>
+    <TransactionList v-if="optionActive == 0" @trancInfo = "trancArrHandle" :topTag = "topTag"></TransactionList>
     <StockTransaction v-if="optionActive == 1"></StockTransaction>
     </keep-alive>
 
@@ -113,7 +113,8 @@ export default {
       klineapi: '',
       sstoday: [],
       trancArr: [],
-      timer: null
+      timer: null,
+      topTag: ''
     };
   },
 
@@ -151,6 +152,9 @@ export default {
           this.sstoday = res.data.snapshot['000001.SS'] || []
         }
       )
+    },
+    _topMsg(msg) {
+      this.topTag = msg
     },
     trancArrHandle(value) {
       console.log(value);

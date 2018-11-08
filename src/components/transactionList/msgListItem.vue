@@ -1,7 +1,7 @@
 <!-- transaction msg list item -->
 <template>
  <div class="msg-list-item">
-    <div class="msg-list-item-time">
+    <div class="msg-list-item-time" :class="topTag?colorName(rate):''">
         <span class="msg-list-item-time-dot" :class="colorName(rate)">
             <i></i>
             <em></em>
@@ -24,15 +24,28 @@
  </div>
 </template>
 <style lang='scss' scoped>
-$red:#e22e42;
+$red:#e82f4e;
 $green:#4da370;
 .msg-list-item{
     padding: 0 16px;
     &-time{
         display: flex;
-        height: 92px;
+        margin: 10px 0;
+        height: 72px;
         align-items: center;
         justify-content: flex-start;
+        &.color-green{
+          background-color: $green;
+          span{
+          color: #fff;
+          }
+        }
+        &.color-red{
+          background-color: $red;
+          span{
+          color: #fff;
+          }
+        }
         &-dot{
             margin-left: -24px;
             display: flex;
@@ -157,6 +170,9 @@ export default {
   props: {
     msg: {
       type: Object
+    },
+    topTag: {
+      default: ''
     }
   },
 
@@ -254,8 +270,6 @@ export default {
         i => {
           i.name = i.Name
           i.symbol = i.Symbol
-          delete i.Name
-          delete i.Symbol
           return i
         }
       )

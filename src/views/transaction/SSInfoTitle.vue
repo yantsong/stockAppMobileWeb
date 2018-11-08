@@ -10,7 +10,7 @@
          <span class="red"><i>高</i>{{ssdata[8].toFixed(2)}}</span>
          <span class="green"><i>低</i>{{ssdata[9].toFixed(2)}}</span>
          <span class="white"><i>振</i>{{ssdata[10].toFixed(2) + '%'}}</span>
-         <span class="white"><i>额</i>{{(ssdata[17]/100000000).toFixed(2)}}亿</span>
+         <span class="white"><i>额</i>{{(ssdata[17]/100000000) > 1000 ? (ssdata[17]/100000000).toFixed(1):(ssdata[17]/100000000).toFixed(2)}}亿</span>
          <span class="white"><i>量比</i>{{ssdata[20].toFixed(2) + '%'}}</span>
      </section>
  </div>
@@ -45,7 +45,7 @@
     }
     .tran-title-info{
         width: 490px;
-            line-height: 44px;
+        line-height: 44px;
         font-size: 26px;
         flex-wrap: wrap;
         display: flex;

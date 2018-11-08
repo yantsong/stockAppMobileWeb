@@ -1,6 +1,7 @@
 <!-- 大盘异动列表 -->
 <template>
  <div class="tansactionList">
+     <MsgListItem :key="topMsg.Id + 'song'" :msg = "topMsg" v-if="topMsg" :topTag = "topTag"></MsgListItem>
      <MsgListItem v-for="item in msgArr" :key="item.Id" :msg = "item"></MsgListItem>
       <div class="transactionList-loading" v-if="loading">
       正在加载...
@@ -31,6 +32,12 @@ export default {
       loading: false
     };
   },
+  props: {
+    topTag: {
+      type: String,
+      default: ''
+    }
+  },
 
   created() {
     this.getlist()
@@ -46,7 +53,15 @@ export default {
   destroyed() {
     window.removeEventListener('scroll', this.handleScroll)
   },
-
+  computed: {
+    topMsg() {
+      if (!this.topTag) return null
+      let arr = this.msgArr.filter(
+        i => i.BkjInfoArr.length && i.BkjInfoArr[0].Name === this.topTag
+      )
+      return arr[arr.length - 1]
+    }
+  },
   methods: {
     // 定时任务
     _setTaskInterval(n) {

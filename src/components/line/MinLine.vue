@@ -14,7 +14,9 @@ require('echarts/lib/chart/bar')
 require('echarts/lib/component/markLine')
 let myChart
 const seriesLineColor = ['#3165c3', '#a5a5a5', '#38b6fc'];
-const pointerColor = ['#f2564e']
+const pointerColor = ['#e82f4e']
+const red = '#e82f4e'
+// const green = '#4da370'
 
 export default {
   data () {
@@ -28,6 +30,7 @@ export default {
       datalinePre: [],
       dataPreValueX: [],
       pointerIndexArr: [],
+      flagPositons: [],
       tagHeight: 15,
       difference: 0,
       rate: '',
@@ -36,7 +39,9 @@ export default {
       heightFlag: 0,
       relativeHeight: 0,
       objMap: {},
-      timer: null
+      timer: null,
+      flagActive: null,
+      flagPindex: null
     }
   },
   props: {
@@ -53,6 +58,25 @@ export default {
   mounted() {
     myChart = echarts.init(document.getElementById('eline'))
     this._autoRefresh(30)
+    let chartDom = document.getElementById('eline')
+    chartDom.addEventListener('click', event => {
+      let x = event.offsetX
+      let y = event.offsetY
+      if (this.flagPositons.length) {
+        this.flagPositons.forEach(
+          i => {
+            if (i.x1 <= x && x <= i.x2 && i.y1 <= y && y < i.y2) {
+              if (this.flagActive === i.tagName && this.flagPindex === i.pIndex) {
+                this.flagActive = null
+              } else {
+                this.flagActive = i.tagName
+                this.flagPindex = i.pIndex
+              }
+            }
+          }
+        )
+      }
+    })
   },
   computed: {
     pointerArr() {
@@ -68,6 +92,7 @@ export default {
         obj['pIndex'] = index
         obj['left'] = index / this.dataPreValueX.length < 0.5
         obj['tagName'] = i.BkjInfoArr[0].Name
+        // obj['rate'] = i.
         return obj
       })
     }
@@ -82,6 +107,10 @@ export default {
       this.empdata()
     },
     pointerArr(value) {
+      this.empdata()
+    },
+    flagActive(value) {
+      this.$emit('onTop', value)
       this.empdata()
     }
   },
@@ -169,7 +198,7 @@ export default {
       this.datalinePre = datalinePre
     },
     empdata() {
-      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight} = this
+      let {dataLineX, dataLineY, datalinePre, dataBarY, min, max, rate, pre_px, pointerArr, tagHeight, flagPindex, flagActive} = this
       // let flagPaddingHeight = 3
       let flagPaddingWidth = 7
       let symbolSize = 7
@@ -177,6 +206,7 @@ export default {
       let objMap
       // 半个分时图大小
       let chartHalfHeight = document.querySelector('#eline').offsetHeight * 2 / 6
+      let chartWidth = document.querySelector('#eline').offsetWidth
       // tag Width
       function tagWidth(item) {
       // 匹配英文和字符
@@ -194,7 +224,6 @@ export default {
         let y
         let i = 1
         let length = parseInt((chartHalfHeight * 2) / tagHeight)
-        console.log(objMap);
         for (let index = 2; index < length - 1; index++) {
           i = i * -1
           let active = i > 0 ? length - index : index
@@ -217,10 +246,10 @@ export default {
       }
       // 一个map
       function makeObj() {
-        let num = parseInt(chartHalfHeight * 2 / tagHeight)
+        let num = parseInt(chartHalfHeight * 2 / (tagHeight + 3))
         let o = {}
         for (let index = 0; index < num; index++) {
-          o[index] = tagHeight * index
+          o[index] = (tagHeight + 3) * index
         }
         objMap = o
         return o
@@ -238,30 +267,54 @@ export default {
           // positonX X轴偏移
           // flagPosition 旗子方向 左右
           let positionX, positionY, flagPosition
+          let fontColor = '#000'
+          let bgColor = 'transparent'
           // flagRate 上方还是下方
+
+          if (index % 4 === 0) objMap = makeObj()
+          let width = tagWidth(item.tagName)
+          let flagRate = dataLineY[item.pIndex].value <= pre_px
+          let xBase = item.pIndex / (dataLineX.length - 1) * chartWidth
+          let yBase = chartHalfHeight * 2 - cptHeight(item)
+          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName}
+          let height = dynamicHeight(item)
           this.relativeHeight = cptHeight(item)
           this.heightFlag = index
-          if (index % 6 === 0) objMap = makeObj()
-          // tagWidth(item.tagName)
-          let flagRate = dataLineY[item.pIndex].value <= pre_px
-          let height = dynamicHeight(item)
           positionY = height + tagHeight
-
+          console.log(flagActive === item.tagName, 'flagacccc', flagActive, item.tagName);
+          if (flagActive === item.tagName && flagPindex === item.pIndex) {
+            bgColor = red
+            fontColor = '#fff'
+          } else {
+            fontColor = '#000'
+          }
           // item[left] 左半边还是右半边
           if (!item['left']) { // 右边
             flagPosition = 'right'
-            positionX = tagWidth(item.tagName) * -1
+            positionX = width * -1
+            positions['x1'] = xBase - width
+            positions['x2'] = xBase
             if (flagRate) { // 右下
               positionY = -positionY
+              positions['y2'] = yBase - height
+              positions['y1'] = yBase - height - tagHeight
             } else { // 右上
               positionY = symbolSize
+              positions['y1'] = yBase + height
+              positions['y2'] = yBase + height + tagHeight
             }
           } else { // 左边
             flagPosition = 'left'
+            positions['x1'] = xBase
+            positions['x2'] = xBase + width
             if (flagRate) { // 左下
               positionX = '50%'
               positionY = -positionY
+              positions['y2'] = yBase - height
+              positions['y1'] = yBase - height - tagHeight
             } else { // 左上
+              positions['y1'] = yBase + height
+              positions['y2'] = yBase + height + tagHeight
               positionX = symbolSize / 2
               positionY = symbolSize
             }
@@ -272,6 +325,7 @@ export default {
             itemStyle: {
               normal: {color: '#fff', borderColor: pointerColor[0]}
             },
+            positions,
             label: {
               formatter: function(p) {
                 return flagRate ? `{a|${item.tagName}}\n{b| }` : `{b| }\n{a|${item.tagName}}`
@@ -279,7 +333,9 @@ export default {
               position: [positionX, positionY],
               rich: {
                 a: {
-                  height: 10
+                  height: 10,
+                  backgroundColor: bgColor,
+                  color: fontColor
                 },
                 b: {
                   align: flagPosition,
@@ -368,15 +424,15 @@ export default {
                 a: {
                   borderWidth: 1,
                   borderColor: pointerColor[0],
-                  backgroundColor: 'transparent',
-                  color: '#000',
+                  // backgroundColor: 'transparent',
+                  // color: '#000',
                   padding: [3, 7],
                   textBorderColor: 'transparent'
                 },
                 b: {
                   align: 'right',
                   width: 0,
-                  backgroundColor: 'transparent',
+                  // backgroundColor: 'transparent',
                   borderWidth: 1
                 }
               }
@@ -395,7 +451,6 @@ export default {
           yAxisIndex: 2,
           data: dataBarY
         }];
-      console.log(`----`, dataLineX, dataLineY, dataBarY);
 
       // 分时图配置
       var tchartOptions = {
@@ -592,6 +647,10 @@ export default {
         series: series
       };
       myChart.setOption(tchartOptions)
+      this.flagPositons = myChart.getOption().series[1].markPoint.data.map(
+        item => item.positions
+      )
+      console.log(myChart.getOption().series[1].markPoint.data);
     }
     //  markPoint: {
     //             symbol:'roundRect',
