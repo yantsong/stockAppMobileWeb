@@ -184,7 +184,7 @@ export default {
           symbolOffset.max = [25, '-200%']
           symbolOffset.min = [25, '-200%']
         } else {
-          symbolOffset.max = [25, '-200%']
+          symbolOffset.max = [25, '-100%']
           symbolOffset.min = [-25, '-200%']
         }
       }
@@ -309,7 +309,7 @@ export default {
           scale: true,
           show: false,
           axisLine: { lineStyle: { color: '#8392A5' } },
-          boundaryGap: ['1.5%', '1.5%'],
+          boundaryGap: ['3%', '1%'],
           axisLabel: {
             inside: true
             // show: false

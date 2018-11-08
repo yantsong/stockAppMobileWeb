@@ -49,6 +49,7 @@ export default {
     setTimeout(() => {
       window.addEventListener('scroll', this.handleScroll)
     }, 200)
+    document.title = '异动提醒'
   },
   destroyed() {
     window.removeEventListener('scroll', this.handleScroll)

@@ -68,6 +68,7 @@ export default {
             if (i.x1 <= x && x <= i.x2 && i.y1 <= y && y < i.y2) {
               if (this.flagActive === i.tagName && this.flagPindex === i.pIndex) {
                 this.flagActive = null
+                this.flagPindex = null
               } else {
                 this.flagActive = i.tagName
                 this.flagPindex = i.pIndex
@@ -223,7 +224,7 @@ export default {
         let x = cptHeight(item)
         let y
         let i = 1
-        let length = parseInt((chartHalfHeight * 2) / tagHeight)
+        let length = Math.floor((chartHalfHeight * 2) / tagHeight)
         for (let index = 2; index < length - 1; index++) {
           i = i * -1
           let active = i > 0 ? length - index : index
@@ -246,7 +247,7 @@ export default {
       }
       // 一个map
       function makeObj() {
-        let num = parseInt(chartHalfHeight * 2 / (tagHeight + 3))
+        let num = Math.floor(chartHalfHeight * 2 / (tagHeight + 3))
         let o = {}
         for (let index = 0; index < num; index++) {
           o[index] = (tagHeight + 3) * index
@@ -269,24 +270,29 @@ export default {
           let positionX, positionY, flagPosition
           let fontColor = '#000'
           let bgColor = 'transparent'
-          // flagRate 上方还是下方
-
-          if (index % 4 === 0) objMap = makeObj()
+          // 间隔几个重置 旗子map
+          if (index % 5 === 0) objMap = makeObj()
+          // tag width
           let width = tagWidth(item.tagName)
-          let flagRate = dataLineY[item.pIndex].value <= pre_px
-          let xBase = item.pIndex / (dataLineX.length - 1) * chartWidth
-          let yBase = chartHalfHeight * 2 - cptHeight(item)
-          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName}
+          // height
           let height = dynamicHeight(item)
-          this.relativeHeight = cptHeight(item)
-          this.heightFlag = index
+          // flagRate 上方还是下方
+          let flagRate = dataLineY[item.pIndex].value <= pre_px
+          // x基点
+          let xBase = item.pIndex / (dataLineX.length - 1) * chartWidth
+          // y基点
+          let yBase = chartHalfHeight * 2 - cptHeight(item)
+          // 位置对象
+          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName}
+          // y轴偏移计算
           positionY = height + tagHeight
-          console.log(flagActive === item.tagName, 'flagacccc', flagActive, item.tagName);
+          // 检测是否是被选中
           if (flagActive === item.tagName && flagPindex === item.pIndex) {
             bgColor = red
             fontColor = '#fff'
           } else {
             fontColor = '#000'
+            bgColor = 'transparent'
           }
           // item[left] 左半边还是右半边
           if (!item['left']) { // 右边
@@ -424,15 +430,12 @@ export default {
                 a: {
                   borderWidth: 1,
                   borderColor: pointerColor[0],
-                  // backgroundColor: 'transparent',
-                  // color: '#000',
                   padding: [3, 7],
                   textBorderColor: 'transparent'
                 },
                 b: {
                   align: 'right',
                   width: 0,
-                  // backgroundColor: 'transparent',
                   borderWidth: 1
                 }
               }
@@ -441,8 +444,6 @@ export default {
             data: pointerData
           },
           symbol: 'none',
-          // symbolSize: 2,
-
           data: datalinePre
         },
         {
