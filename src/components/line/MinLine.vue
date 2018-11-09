@@ -66,11 +66,14 @@ export default {
       if (this.flagPositons.length) {
         this.flagPositons.forEach(
           i => {
-            if (i.x1 <= x && x <= i.x2 && i.y1 <= y && y < i.y2) {
+            console.log(`x=${x},x1=${i.x1},x2=${i.x2}`, `y=${y},y1=${i.y1}y2=${i.y2}`);
+            if (i.x1 - 10 <= x && x <= i.x2 + 10 && i.y1 - 10 <= y && y < i.y2 + 10) {
               if (this.flagId === i.Id) {
+                console.log(this.flagId);
                 this.flagActive = null
                 this.flagId = null
               } else {
+                console.log(this.flagId);
                 this.flagActive = i.tagName
                 this.flagId = i.Id
               }
