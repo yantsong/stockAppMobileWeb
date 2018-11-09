@@ -40,7 +40,6 @@ export default {
       relativeHeight: 0,
       objMap: {},
       timer: null,
-      flagActive: null,
       flagPindex: null,
       flagId: null
     }
@@ -66,15 +65,11 @@ export default {
       if (this.flagPositons.length) {
         this.flagPositons.forEach(
           i => {
-            console.log(`x=${x},x1=${i.x1},x2=${i.x2}`, `y=${y},y1=${i.y1}y2=${i.y2}`);
+            console.log(`x=${x},x1=${i.x1},x2=${i.x2}`, `y=${y},y1=${i.y1}y2=${i.y2}`, `ybase:${i.ybase}`);
             if (i.x1 - 10 <= x && x <= i.x2 + 10 && i.y1 - 10 <= y && y < i.y2 + 10) {
               if (this.flagId === i.Id) {
-                console.log(this.flagId);
-                this.flagActive = null
                 this.flagId = null
               } else {
-                console.log(this.flagId);
-                this.flagActive = i.tagName
                 this.flagId = i.Id
               }
             }
@@ -217,6 +212,11 @@ export default {
       // 匹配英文和字符
         let count = item.match(/\w|&/g)
         let length = item.length
+        // 空格和符号 · 大约1.7个空格和符号占1个字符位
+        let space = item.match(/\s|·/g)
+        if (space) {
+          length = length - space.length / 1.7
+        }
         // 计算长度
         if (count) {
           return (length - count.length) * flagFontSize + count.length * (flagFontSize - 4) + flagPaddingWidth + 2 * 1
@@ -269,9 +269,11 @@ export default {
       pointerArr = pointerArr.filter(i => i.pIndex !== -1)
       // 计算距底边
       function cptHeight (item) {
-        let distanceRate = (dataLineY[item.pIndex].value - min) / (pre_px - min)
-        return chartHalfHeight * distanceRate
+        let distanceRate = (dataLineY[item.pIndex].value - min) / (max - min)
+        console.log(`value=${dataLineY[item.pIndex].value},${min},${max},max-min=${max - min}`);
+        return chartHalfHeight * distanceRate * 2
       }
+
       let pointerData = pointerArr.map(
         (item, index) => {
           // positonX X轴偏移
@@ -280,7 +282,7 @@ export default {
           let fontColor = '#000'
           let bgColor = 'transparent'
           // 间隔几个重置 旗子map
-          if (index % 5 === 0) objMap = makeObj()
+          if (index % 7 === 0) objMap = makeObj()
           // tag width
           let width = tagWidth(item.tagName)
           // height
@@ -291,8 +293,9 @@ export default {
           let xBase = item.pIndex / (dataLineX.length - 1) * chartWidth
           // y基点
           let yBase = chartHalfHeight * 2 - cptHeight(item)
+          console.log(chartHalfHeight * 2, cptHeight(item), 'cpt');
           // 位置对象
-          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName, 'Id': item.Id}
+          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName, 'Id': item.Id, 'ybase': yBase}
           // y轴偏移计算
           positionY = height + tagHeight
           // 检测是否是被选中
@@ -503,7 +506,9 @@ export default {
             axisLabel: {
               show: true,
               align: 'center',
+              lineHeight: 100,
               textStyle: {
+                // height: 100,
                 color: '#c3c5c3'
               },
               interval: (index, val) => {
