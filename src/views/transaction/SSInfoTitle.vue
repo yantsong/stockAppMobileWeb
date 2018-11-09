@@ -77,7 +77,6 @@ export default {
   created() {},
 
   mounted() {
-    console.log(this.ssdata);
   },
 
   methods: {},

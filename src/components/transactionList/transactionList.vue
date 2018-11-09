@@ -131,7 +131,6 @@ export default {
       let trancArr = this.msgArr.filter(
         i => i['BkjInfoArr'].length
       )
-      console.log(trancArr);
       this.$emit('trancInfo', trancArr)
     }
   },
@@ -144,11 +143,5 @@ export default {
 .tansactionList{
     margin: 0 20px;
     border-left: 1px dashed #e5e5e6;
-}
-.height-enter-active, .height-leave-active {
-  transition: all 1s;
-}
-.height-enter, .height-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  max-height: 0;
 }
 </style>

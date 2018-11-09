@@ -65,8 +65,8 @@ export default {
       if (this.flagPositons.length) {
         this.flagPositons.forEach(
           i => {
-            console.log(`x=${x},x1=${i.x1},x2=${i.x2}`, `y=${y},y1=${i.y1}y2=${i.y2}`, `ybase:${i.ybase}`);
-            if (i.x1 - 10 <= x && x <= i.x2 + 10 && i.y1 - 10 <= y && y < i.y2 + 10) {
+            // console.log(`x=${x},x1=${i.x1},x2=${i.x2}`, `y=${y},y1=${i.y1}y2=${i.y2}`, `ybase:${i.ybase}`);
+            if (i.x1 - 10 <= x && x <= i.x2 + 10 && i.y1 - 2 <= y && y < i.y2 + 2) {
               if (this.flagId === i.Id) {
                 this.flagId = null
               } else {
@@ -205,7 +205,7 @@ export default {
       let flagFontSize = 12
       let objMap
       // 半个分时图大小
-      let chartHalfHeight = document.querySelector('#eline').offsetHeight * 2 / 6
+      let chartHalfHeight = (document.querySelector('#eline').offsetHeight * 0.72 - 20) / 2
       let chartWidth = document.querySelector('#eline').offsetWidth
       // tag Width
       function tagWidth(item) {
@@ -224,6 +224,7 @@ export default {
           return length * flagFontSize + flagPaddingWidth + 2 * 1
         }
       }
+      // 控制循环状态的变量
       let iStatus = 1
       // 计算动态高度
       function dynamicHeight(item) {
@@ -236,7 +237,6 @@ export default {
           let active = iStatus > 0 ? length - index : index
           // 该区间已经有值 跳过
           if (!objMap[active]) continue;
-          console.log(objMap[active], active, 'active', iStatus);
           if (x < chartHalfHeight) { // 下半区
             if (objMap[active] - tagHeight > x) { // 下半区旗子向上 所以 objMap区间的x值必须要大于x 而且最小距离不小于tagheight
               y = objMap[active] - x
@@ -247,7 +247,6 @@ export default {
             if (objMap[active] + tagHeight < x) { // 上半区旗子向下 所以objMap 必须小于x 而且最小距离不小于tagheight
               y = x - objMap[active]
               objMap[active] = null
-              console.log('y的index', active);
               return y
             }
           }
@@ -270,7 +269,6 @@ export default {
       // 计算距底边
       function cptHeight (item) {
         let distanceRate = (dataLineY[item.pIndex].value - min) / (max - min)
-        console.log(`value=${dataLineY[item.pIndex].value},${min},${max},max-min=${max - min}`);
         return chartHalfHeight * distanceRate * 2
       }
 
@@ -293,9 +291,8 @@ export default {
           let xBase = item.pIndex / (dataLineX.length - 1) * chartWidth
           // y基点
           let yBase = chartHalfHeight * 2 - cptHeight(item)
-          console.log(chartHalfHeight * 2, cptHeight(item), 'cpt');
           // 位置对象
-          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName, 'Id': item.Id, 'ybase': yBase}
+          let positions = {'pIndex': item.pIndex, 'tagName': item.tagName, 'Id': item.Id}
           // y轴偏移计算
           positionY = height + tagHeight
           // 检测是否是被选中
