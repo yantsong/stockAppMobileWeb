@@ -280,7 +280,7 @@ export default {
           let fontColor = '#000'
           let bgColor = 'transparent'
           // 间隔几个重置 旗子map
-          if (index % 7 === 0) objMap = makeObj()
+          if (index % 5 === 0) objMap = makeObj()
           // tag width
           let width = tagWidth(item.tagName)
           // height
@@ -651,7 +651,8 @@ export default {
         dataZoom: [
           {
             type: 'inside',
-            y: '100%'
+            y: '100%',
+            x: '100%'
           }
         ],
         series: series
