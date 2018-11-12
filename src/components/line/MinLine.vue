@@ -648,13 +648,13 @@ export default {
             min: 'dataMin'
           }
         ],
-        dataZoom: [
-          {
-            type: 'inside',
-            y: '100%',
-            x: '100%'
-          }
-        ],
+        // dataZoom: [
+        //   {
+        //     type: 'inside',
+        //     y: '100%',
+        //     x: '100%'
+        //   }
+        // ],
         series: series
       };
       myChart.setOption(tchartOptions)
